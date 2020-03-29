@@ -1,13 +1,13 @@
 #include <iostream>
-#include "version.h"
-#include "libs/cxxopts.hpp"
 #include <memory>
+#include "./version.h"
+#include "libs/cxxopts.hpp"
 
 void print_version() {
     std::cout << "dlog version " << dlog_VERSION_MAJOR << "." << dlog_VERSION_MINOR << "." << dlog_VERSION_PATCH << std::endl;
 }
 
-void process_options(const cxxopts::ParseResult& parse_result, cxxopts::Options& options) {
+void process_options(const cxxopts::ParseResult& parse_result, const cxxopts::Options& options) {
     if (parse_result.count("version")) {
         print_version();
     }
