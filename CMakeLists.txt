@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 3.10)
+project(dlog VERSION 0.0.1)
+add_executable(dlog main.cpp)
+configure_file(version.h.in version.h)
+target_include_directories(dlog PUBLIC "${PROJECT_BINARY_DIR}")

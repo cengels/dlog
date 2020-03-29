@@ -1,0 +1,3 @@
+#define dlog_VERSION_MAJOR @dlog_VERSION_MAJOR@
+#define dlog_VERSION_MINOR @dlog_VERSION_MINOR@
+#define dlog_VERSION_PATCH @dlog_VERSION_PATCH@

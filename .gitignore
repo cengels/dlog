@@ -1,0 +1,11 @@
+.vscode/
+out/
+*.out
+
+.cmake/
+CMakeFiles/
+*.cmake
+CMakeCache.txt
+Makefile
+
+version.h
