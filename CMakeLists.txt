@@ -1,8 +1,16 @@
 cmake_minimum_required(VERSION 3.10)
 project(dlog LANGUAGES CXX VERSION 0.0.1)
-add_executable(dlog src/main.cpp)
+
+file(GLOB_RECURSE SOURCES
+    CONFIGURE DEPENDS
+    "src/*.h"
+    "src/*.cpp"
+)
+
+add_executable(dlog ${SOURCES})
 configure_file(version.h.in version.h)
 set(ENV{CMAKE_EXPORT_COMPILE_COMMANDS} TRUE)
+add_compile_options(-std=c++2a -fmodules-ts)
 option(USE_LINTERS "Should compilation use linters?" OFF)
 
 if (USE_LINTERS)
