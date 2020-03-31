@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 project(dlog LANGUAGES CXX VERSION 0.0.1)
-add_executable(dlog main.cpp)
+add_executable(dlog src/main.cpp)
 configure_file(version.h.in version.h)
 set(ENV{CMAKE_EXPORT_COMPILE_COMMANDS} TRUE)
 option(USE_LINTERS "Should compilation use linters?" OFF)

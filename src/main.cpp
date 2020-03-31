@@ -1,6 +1,6 @@
 #include <iostream>
 #include <memory>
-#include "./version.h"
+#include "version.h"
 #include "libs/cxxopts.hpp"
 
 void print_version() {
