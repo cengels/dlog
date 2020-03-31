@@ -1,8 +1,8 @@
 #include <iostream>
 #include <memory>
-#include "version.h"
+#include "./version.h"
 #include "libs/cxxopts.hpp"
-#include "options.h"
+#include "./options.h"
 
 void print_version() {
     std::cout << "dlog version "
@@ -12,11 +12,11 @@ void print_version() {
 }
 
 void options::process_options(const cxxopts::ParseResult& parse_result, const cxxopts::Options& options) {
-    if (parse_result.count("version")) {
+    if (parse_result.count("version") > 0) {
         print_version();
     }
 
-    if (parse_result.count("help") || parse_result.arguments().size() == 0) {
+    if (parse_result.count("help") > 0 || parse_result.arguments().empty()) {
         std::cout << options.help() << std::endl;
     }
 }

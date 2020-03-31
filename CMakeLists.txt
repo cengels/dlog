@@ -10,6 +10,7 @@ file(GLOB_RECURSE SOURCES
 add_executable(dlog ${SOURCES})
 configure_file(version.h.in version.h)
 set(ENV{CMAKE_EXPORT_COMPILE_COMMANDS} TRUE)
+set(CLANG_TIDY_CHECKS *,-llvm-include-order,-fuchsia-default-arguments)
 add_compile_options(-std=c++2a -fmodules-ts)
 option(USE_LINTERS "Should compilation use linters?" OFF)
 
@@ -19,9 +20,8 @@ if (USE_LINTERS)
     find_program(CPPLINT NAMES cpplint cpplint.py)
 
     if (CLANG_TIDY)
-        # set(CMAKE_CXX_CLANG_TIDY ${CLANG_TIDY};-checks=*;-warnings-as-errors=*)
         message(STATUS "Found clang-tidy. Configuring...")
-        set_property(TARGET dlog PROPERTY CXX_CLANG_TIDY ${CLANG_TIDY};-checks=*;-warnings-as-errors=*)
+        set_property(TARGET dlog PROPERTY CXX_CLANG_TIDY ${CLANG_TIDY};-checks=${CLANG_TIDY_CHECKS})
     else()
         message(STATUS "Did not find clang-tidy. Proceeding without...")
     endif()
