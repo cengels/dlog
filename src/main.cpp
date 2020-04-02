@@ -1,10 +1,13 @@
 #include <iostream>
 #include <memory>
+#include <string>
 #include "libs/cxxopts.hpp"
 #include "./options.h"
 
 int main(int arg_count, char *args[]) {
     const auto options = options::get_options();
+
+    std::cout << "running dlog" << std::endl;
 
     try {
         const cxxopts::ParseResult result = options->parse(arg_count, args);
