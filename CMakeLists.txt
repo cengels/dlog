@@ -21,8 +21,10 @@ CHECK_INCLUDE_FILE_CXX(windows.h IS_WINDOWS)
 
 if (IS_WINDOWS)
     # add_compile_definitions(USE_WINDOWS_H)
+    message(STATUS "Compiling program for Windows...")
     target_sources(dlog PRIVATE ${SOURCES} ./src/window_hooks/foreground_win.cpp)
 else()
+    message(STATUS "Compiling program for Unix...")
     target_sources(dlog PRIVATE ${SOURCES} ./src/window_hooks/foreground_unix.cpp)
 endif()
 
