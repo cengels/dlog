@@ -5,7 +5,7 @@ project(dlog LANGUAGES CXX VERSION 0.0.1)
 
 add_executable(dlog "src/main.cpp"
     "src/options.cpp" "src/options.h"
-    "src/config.cpp" "src/config.h"
+    "src/entry.h" "src/config.h"
 )
 configure_file(version.h.in version.h)
 set(ENV{CMAKE_EXPORT_COMPILE_COMMANDS} TRUE)

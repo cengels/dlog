@@ -51,7 +51,8 @@ static std::string process_subcommand(int& arg_count, char **& args) {
         }
 
         subcommand += args[i];
-        std::copy(args+i+1, args+arg_count, args+i);  // delete array element
+        // "delete" array element by copying it to the end and decrementing arg_count
+        std::copy(args+i+1, args+arg_count, args+i);
         arg_count--;
         i--;
     }
