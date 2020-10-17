@@ -12,7 +12,7 @@ int main(int arg_count, char *args[]) {
     try {
         const cxxopts::ParseResult result = options->parse(arg_count, args);
 
-        options::process_options(result, *options);
+        options::process(result, *options);
     } catch (const cxxopts::OptionException& e) {
         std::cout << e.what() << std::endl;
 

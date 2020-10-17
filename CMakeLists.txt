@@ -5,25 +5,12 @@ project(dlog LANGUAGES CXX VERSION 0.0.1)
 
 add_executable(dlog "src/main.cpp"
     "src/options.cpp" "src/options.h"
-    "src/tracker.cpp" "src/tracker.h"
     "src/config.cpp" "src/config.h"
-    "src/window_hooks/window_hooks.h"
 )
 configure_file(version.h.in version.h)
 set(ENV{CMAKE_EXPORT_COMPILE_COMMANDS} TRUE)
-set(CLANG_TIDY_CHECKS *,-llvm-include-order,-fuchsia-default-arguments,-clang-diagnostic-error,-misc-unused-parameters)
+set(CLANG_TIDY_CHECKS *,-llvm-include-order,-fuchsia-default-arguments,-clang-diagnostic-error,-misc-unused-parameters,-llvm-namespace-comment)
 option(USE_LINTERS "Should compilation use linters?" ON)
-
-CHECK_INCLUDE_FILE_CXX(windows.h IS_WINDOWS)
-
-if (IS_WINDOWS)
-    # add_compile_definitions(USE_WINDOWS_H)
-    message(STATUS "Compiling program for Windows...")
-    target_sources(dlog PRIVATE ${SOURCES} ./src/window_hooks/foreground_win.cpp)
-else()
-    message(STATUS "Compiling program for Unix...")
-    target_sources(dlog PRIVATE ${SOURCES} ./src/window_hooks/foreground_unix.cpp)
-endif()
 
 if (USE_LINTERS)
     find_program(CLANG_TIDY NAMES clang-tidy-7 clang-tidy-6.0 clang-tidy-5.0 clang-tidy-4.0 clang-tidy)
