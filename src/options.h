@@ -8,7 +8,5 @@
  */
 namespace options {
     /// Processes the given command line options.
-    void process(const cxxopts::ParseResult& parse_result, const cxxopts::Options& options);
-    /// Gets all available command line options.
-    std::unique_ptr<cxxopts::Options> get_options();
+    void process(int& arg_count, char **&args);
 }

@@ -13,7 +13,22 @@ static void print_version() {
         << dlog_VERSION_PATCH << std::endl;
 }
 
-void options::process(const cxxopts::ParseResult& parse_result, const cxxopts::Options& options) {
+static cxxopts::Options get_options() {
+    auto options = cxxopts::Options("dlog", "Configurable command line time tracking.");
+
+    options.add_options()
+        ("v,version", "Prints the installed version.")
+        ("h,help", "Prints all available commands.")
+        ("f,file", "Specify an output file.", cxxopts::value<std::string>());
+
+    return options;
+}
+
+static void process_options(const cxxopts::ParseResult& parse_result, const cxxopts::Options& options) {
+    if (parse_result.count("subcommand") > 0) {
+        std::cout << parse_result["subcommand"].as<std::string>();
+    }
+
     if (parse_result.count("version") > 0) {
         print_version();
     }
@@ -23,13 +38,32 @@ void options::process(const cxxopts::ParseResult& parse_result, const cxxopts::O
     }
 }
 
-std::unique_ptr<cxxopts::Options> options::get_options() {
-    auto options = std::make_unique<cxxopts::Options>("dlog", "Configurable command line time tracking.");
+/**
+ * Processes any subcommands immediately following the program name
+ * and removes the corresponding arguments from the args array.
+ */
+static std::string process_subcommand(int& arg_count, char **& args) {
+    std::string subcommand = std::string();
 
-    options->add_options()
-        ("v,version", "Prints the installed version.")
-        ("h,help", "Prints all available commands.")
-        ("f,file", "Specify an output file.", cxxopts::value<std::string>());
+    for (int i = 1; i < arg_count && args[i][0] != '-'; i++) {
+        if (!subcommand.empty()) {
+            subcommand += " ";
+        }
 
-    return options;
+        subcommand += args[i];
+        std::copy(args+i+1, args+arg_count, args+i);  // delete array element
+        arg_count--;
+        i--;
+    }
+
+    return subcommand;
+}
+
+void options::process(int& arg_count, char **&args) {
+    const auto subcommand = process_subcommand(arg_count, args);
+
+    cxxopts::Options options = get_options();
+    const cxxopts::ParseResult result = options.parse(arg_count, args);
+
+    process_options(result, options);
 }
