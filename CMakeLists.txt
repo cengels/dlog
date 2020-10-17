@@ -3,15 +3,12 @@ include(CheckIncludeFileCXX)
 cmake_minimum_required(VERSION 3.10)
 project(dlog LANGUAGES CXX VERSION 0.0.1)
 
-file(GLOB SOURCES
-    CONFIGURE DEPENDS
-    "src/*.h"
-    "src/*.cpp"
-    "src/**/*.h"
-    "src/!(window_hooks)/*.cpp"
+add_executable(dlog "src/main.cpp"
+    "src/options.cpp" "src/options.h"
+    "src/tracker.cpp" "src/tracker.h"
+    "src/config.cpp" "src/config.h"
+    "src/window_hooks/window_hooks.h"
 )
-
-add_executable(dlog ${SOURCES})
 configure_file(version.h.in version.h)
 set(ENV{CMAKE_EXPORT_COMPILE_COMMANDS} TRUE)
 set(CLANG_TIDY_CHECKS *,-llvm-include-order,-fuchsia-default-arguments,-clang-diagnostic-error)
