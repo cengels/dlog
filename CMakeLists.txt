@@ -11,7 +11,7 @@ add_executable(dlog "src/main.cpp"
 )
 configure_file(version.h.in version.h)
 set(ENV{CMAKE_EXPORT_COMPILE_COMMANDS} TRUE)
-set(CLANG_TIDY_CHECKS *,-llvm-include-order,-fuchsia-default-arguments,-clang-diagnostic-error)
+set(CLANG_TIDY_CHECKS *,-llvm-include-order,-fuchsia-default-arguments,-clang-diagnostic-error,-misc-unused-parameters)
 option(USE_LINTERS "Should compilation use linters?" ON)
 
 CHECK_INCLUDE_FILE_CXX(windows.h IS_WINDOWS)
