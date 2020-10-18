@@ -2,7 +2,8 @@
 #include "version.h"
 #include "subcommands.h"
 
-static void print_version() {
+static void print_version()
+{
     std::cout << "dlog version "
         << dlog_VERSION_MAJOR << "."
         << dlog_VERSION_MINOR << "."

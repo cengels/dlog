@@ -5,7 +5,8 @@
 #pragma once
 
 /// Represents a dlog time entry.
-struct entry {
+struct entry
+{
     /// A POSIX time point defining the start of the time entry.
     time_t from;
     /// A POSIX time point defining the end of the time entry.

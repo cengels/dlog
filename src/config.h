@@ -2,6 +2,7 @@
 
 #pragma once
 
-struct config {
+struct config
+{
     std::string output_file;
 };

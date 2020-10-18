@@ -11,7 +11,8 @@
  * Processes any subcommands immediately following the program name
  * and removes the corresponding arguments from the args array.
  */
-static std::string parse_subcommand(int& arg_count, char **& args) {
+static std::string parse_subcommand(int& arg_count, char **& args)
+{
     std::string subcommand = std::string();
 
     for (int i = 1; i < arg_count && args[i][0] != '-'; i++) {
@@ -29,7 +30,8 @@ static std::string parse_subcommand(int& arg_count, char **& args) {
     return subcommand;
 }
 
-int command_line::parse(int& arg_count, char **&args) {
+int command_line::parse(int& arg_count, char **&args)
+{
     const auto subcommand_string = parse_subcommand(arg_count, args);
     auto* subcommand = subcommands::find(subcommand_string);
 

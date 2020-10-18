@@ -11,7 +11,8 @@ namespace subcommands {
      * and override subcommand::run() to define what should happen
      * if the user calls this subcommand.
      */
-    class subcommand {
+    class subcommand
+    {
         public:
             virtual ~subcommand() = default;
 

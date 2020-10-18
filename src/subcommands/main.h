@@ -4,7 +4,8 @@
 #pragma once
 
 namespace subcommands {
-    class main : public subcommands::subcommand {
+    class main : public subcommands::subcommand
+    {
         public:
             int run(const cxxopts::ParseResult& parsedOptions) override;
             std::string command() const override;
