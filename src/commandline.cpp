@@ -1,10 +1,10 @@
 #include <iostream>
-#include <memory>
 #include <stdexcept>
 #include <string>
-#include "./version.h"
-#include "libs/cxxopts.hpp"
-#include "./commandline.h"
+#include <memory>
+#include "cxxopts.hpp"
+#include "version.h"
+#include "commandline.h"
 
 static void print_version() {
     std::cout << "dlog version "
@@ -18,17 +18,12 @@ static cxxopts::Options get_options() {
 
     options.add_options()
         ("v,version", "Prints the installed version.")
-        ("h,help", "Prints all available commands.")
-        ("f,file", "Specify an output file.", cxxopts::value<std::string>());
+        ("h,help", "Prints all available commands.");
 
     return options;
 }
 
 static void process_options(const cxxopts::ParseResult& parse_result, const cxxopts::Options& options) {
-    if (parse_result.count("subcommand") > 0) {
-        std::cout << parse_result["subcommand"].as<std::string>();
-    }
-
     if (parse_result.count("version") > 0) {
         print_version();
     }
