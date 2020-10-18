@@ -4,7 +4,7 @@
 #include <string>
 #include "./version.h"
 #include "libs/cxxopts.hpp"
-#include "./options.h"
+#include "./commandline.h"
 
 static void print_version() {
     std::cout << "dlog version "
@@ -42,7 +42,7 @@ static void process_options(const cxxopts::ParseResult& parse_result, const cxxo
  * Processes any subcommands immediately following the program name
  * and removes the corresponding arguments from the args array.
  */
-static std::string process_subcommand(int& arg_count, char **& args) {
+static std::string parse_subcommand(int& arg_count, char **& args) {
     std::string subcommand = std::string();
 
     for (int i = 1; i < arg_count && args[i][0] != '-'; i++) {
@@ -60,8 +60,8 @@ static std::string process_subcommand(int& arg_count, char **& args) {
     return subcommand;
 }
 
-void options::process(int& arg_count, char **&args) {
-    const auto subcommand = process_subcommand(arg_count, args);
+void command_line::parse(int& arg_count, char **&args) {
+    const auto subcommand = parse_subcommand(arg_count, args);
 
     cxxopts::Options options = get_options();
     const cxxopts::ParseResult result = options.parse(arg_count, args);

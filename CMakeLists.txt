@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.10)
 project(dlog LANGUAGES CXX VERSION 0.0.1)
 
 add_executable(dlog "src/main.cpp"
-    "src/options.cpp" "src/options.h"
+    "src/commandline.cpp" "src/commandline.h"
     "src/entry.h" "src/config.h"
 )
 configure_file(version.h.in version.h)
