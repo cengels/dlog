@@ -8,9 +8,12 @@ add_executable(dlog "src/main.cpp"
     "src/entry.h" "src/config.h"
 )
 configure_file(version.h.in version.h)
+
+set(CMAKE_CXX_STANDARD 17)
 set(ENV{CMAKE_EXPORT_COMPILE_COMMANDS} TRUE)
-set(CLANG_TIDY_CHECKS *,-llvm-include-order,-fuchsia-default-arguments,-clang-diagnostic-error,-misc-unused-parameters,-llvm-namespace-comment,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-google-runtime-references)
+set(CLANG_TIDY_CHECKS *,-llvm-include-order,-fuchsia-default-arguments,-clang-diagnostic-error,-misc-unused-parameters,-llvm-namespace-comment,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-google-runtime-references,-cppcoreguidelines-owning-memory)
 option(USE_LINTERS "Should compilation use linters?" ON)
+target_compile_features(dlog PUBLIC cxx_std_17)
 
 if (USE_LINTERS)
     find_program(CLANG_TIDY NAMES clang-tidy-7 clang-tidy-6.0 clang-tidy-5.0 clang-tidy-4.0 clang-tidy)
