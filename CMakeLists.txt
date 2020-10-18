@@ -9,6 +9,7 @@ add_executable(dlog "src/main.cpp"
     "src/subcommands/subcommands.h" "src/subcommands/subcommands.cpp"
     "src/subcommands/subcommand.h" "src/subcommands/subcommand.cpp"
     "src/subcommands/main.h" "src/subcommands/main.cpp"
+    "src/subcommands/start.h" "src/subcommands/start.cpp"
 )
 configure_file(version.h.in version.h)
 
