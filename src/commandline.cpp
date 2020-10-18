@@ -5,33 +5,7 @@
 #include "cxxopts.hpp"
 #include "version.h"
 #include "commandline.h"
-
-static void print_version() {
-    std::cout << "dlog version "
-        << dlog_VERSION_MAJOR << "."
-        << dlog_VERSION_MINOR << "."
-        << dlog_VERSION_PATCH << std::endl;
-}
-
-static cxxopts::Options get_options() {
-    auto options = cxxopts::Options("dlog", "Configurable command line time tracking.");
-
-    options.add_options()
-        ("v,version", "Prints the installed version.")
-        ("h,help", "Prints all available commands.");
-
-    return options;
-}
-
-static void process_options(const cxxopts::ParseResult& parse_result, const cxxopts::Options& options) {
-    if (parse_result.count("version") > 0) {
-        print_version();
-    }
-
-    if (parse_result.count("help") > 0 || parse_result.arguments().empty()) {
-        std::cout << options.help() << std::endl;
-    }
-}
+#include "subcommands/subcommands.h"
 
 /**
  * Processes any subcommands immediately following the program name
@@ -55,11 +29,18 @@ static std::string parse_subcommand(int& arg_count, char **& args) {
     return subcommand;
 }
 
-void command_line::parse(int& arg_count, char **&args) {
-    const auto subcommand = parse_subcommand(arg_count, args);
+int command_line::parse(int& arg_count, char **&args) {
+    const auto subcommand_string = parse_subcommand(arg_count, args);
+    auto* subcommand = subcommands::find(subcommand_string);
 
-    cxxopts::Options options = get_options();
-    const cxxopts::ParseResult result = options.parse(arg_count, args);
+    if (subcommand == nullptr) {
+        std::cout << "Invalid command: " << subcommand_string << std::endl
+                  << "Run dlog -h to view a list of available commands." << std::endl;
 
-    process_options(result, options);
+        return 2;
+    }
+
+    const auto parsedOptions = subcommand->options().parse(arg_count, args);
+
+    return subcommand->run(parsedOptions);
 }

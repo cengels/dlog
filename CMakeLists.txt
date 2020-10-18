@@ -6,6 +6,9 @@ project(dlog LANGUAGES CXX VERSION 0.0.1)
 add_executable(dlog "src/main.cpp"
     "src/commandline.cpp" "src/commandline.h"
     "src/entry.h" "src/config.h"
+    "src/subcommands/subcommands.h" "src/subcommands/subcommands.cpp"
+    "src/subcommands/subcommand.h" "src/subcommands/subcommand.cpp"
+    "src/subcommands/main.h" "src/subcommands/main.cpp"
 )
 configure_file(version.h.in version.h)
 

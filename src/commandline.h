@@ -5,5 +5,5 @@
  */
 namespace command_line {
     /// Parses the given command line arguments.
-    void parse(int& arg_count, char **&args);
+    int parse(int& arg_count, char **&args);
 }
