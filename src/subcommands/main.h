@@ -9,6 +9,7 @@ namespace subcommands {
         public:
             int run(const cxxopts::ParseResult& parsedOptions) override;
             std::string command() const override;
+            std::string syntax() const override;
             std::string description() const override;
             std::string help() const override;
             virtual cxxopts::Options options() const override;

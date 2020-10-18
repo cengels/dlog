@@ -1,4 +1,6 @@
 #include "subcommands.h"
+#include "main.h"
+#include "start.h"
 
 namespace {
     std::vector<subcommands::subcommand*>* vector = nullptr;
@@ -7,7 +9,10 @@ namespace {
 std::vector<subcommands::subcommand*>& subcommands::subcommands()
 {
     if (vector == nullptr) {
-        vector = new std::vector<subcommands::subcommand*>{ new subcommands::main() };
+        vector = new std::vector<subcommands::subcommand*>{
+            new subcommands::main(),
+            new subcommands::start()
+        };
     }
 
     return *vector;

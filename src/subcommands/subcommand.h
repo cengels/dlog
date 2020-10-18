@@ -25,6 +25,9 @@ namespace subcommands {
             /** Gets a string describing this command. */
             virtual std::string description() const = 0;
 
+            /** A string that is appended to the command when calling -h. Should describe the argument syntax. */
+            virtual std::string syntax() const;
+
             /** Gets a string containing information about how this subcommand is to be used. */
             virtual std::string help() const;
 

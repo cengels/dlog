@@ -18,8 +18,6 @@ cxxopts::Options subcommands::main::options() const
         ("v,version", "Prints the installed version.")
         ("h,help", "Prints all available commands.");
 
-    opts.custom_help("[-v | -h]");
-
     return opts;
 }
 
@@ -37,9 +35,15 @@ std::string subcommands::main::command() const
     return std::string();
 }
 
+std::string subcommands::main::syntax() const
+{
+    return "[-v] [-h]";
+}
+
 std::string subcommands::main::description() const
 {
-    return "Configurable command line time tracking.";
+    return "dlog is a command-line interface that helps you\n  "
+           "track your time and where you spend it.";
 }
 
 std::string subcommands::main::help() const
@@ -47,15 +51,16 @@ std::string subcommands::main::help() const
     auto string = subcommands::subcommand::help();
 
     string.append("\n"
-    "  Commands:"
-    "\n\n");
+    "Commands:"
+    "\n");
 
     for (const auto* subcommand : subcommands::subcommands()) {
         if (subcommand != this) {
-            string.append("    dlog ");
+            string.append("  ");
             string.append(subcommand->command());
-            string.append("\t");
-            string.append(subcommand->description());
+            string.append(" \t");
+            const std::string description = subcommand->description();
+            string.append(description.substr(0, description.find('\n', 1)));
         }
     }
 

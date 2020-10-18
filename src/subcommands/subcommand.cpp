@@ -20,7 +20,13 @@ cxxopts::Options subcommands::subcommand::options() const
         command.insert(0, "dlog ");
     }
 
-    cxxopts::Options opts(command, this->description());
+    cxxopts::Options opts(command);
+
+    std::string custom_help = this->syntax();
+    custom_help.append("\n\n  ");
+    custom_help.append(this->description());
+
+    opts.custom_help(custom_help);
 
     return opts;
 }
@@ -28,4 +34,9 @@ cxxopts::Options subcommands::subcommand::options() const
 std::string subcommands::subcommand::help() const
 {
     return this->options().help();
+}
+
+std::string subcommands::subcommand::syntax() const
+{
+    return std::string();
 }
