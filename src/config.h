@@ -19,7 +19,10 @@ namespace config {
     /** Gets the config, loading it from the file system if it hasn't been already. */
     const config::structure& config();
 
-    /** Gets the file path where the config is located according to the environment variable DLOG_PATH. */
+    /**
+     * Gets the file path where the config is located according to the environment variable DLOG_PATH
+     * or if that variable is not defined, a default path determined by the system.
+     **/
     const std::optional<std::experimental::filesystem::path> path();
 
     /** Sets a config property and writes it to the file system. */
