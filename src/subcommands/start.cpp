@@ -1,5 +1,6 @@
 #include "start.h"
 #include "version.h"
+#include "../config.h"
 #include "subcommands.h"
 
 cxxopts::Options subcommands::start::options() const
@@ -17,7 +18,11 @@ cxxopts::Options subcommands::start::options() const
 
 int subcommands::start::run(const cxxopts::ParseResult& parsedOptions)
 {
-    return subcommands::subcommand::run(parsedOptions);
+    std::cout << "confirm_new: " << std::boolalpha << config::config().confirm_new << std::endl;
+
+    // Prints help
+    // return subcommands::subcommand::run(parsedOptions);
+    return 0;
 }
 
 std::string subcommands::start::command() const

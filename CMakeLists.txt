@@ -5,7 +5,8 @@ project(dlog LANGUAGES CXX VERSION 0.0.1)
 
 add_executable(dlog "src/main.cpp"
     "src/commandline.cpp" "src/commandline.h"
-    "src/entry.h" "src/config.h"
+    "src/entry.h"
+    "src/config.h" "src/config.cpp"
     "src/subcommands/subcommands.h" "src/subcommands/subcommands.cpp"
     "src/subcommands/subcommand.h" "src/subcommands/subcommand.cpp"
     "src/subcommands/main.h" "src/subcommands/main.cpp"
@@ -18,6 +19,13 @@ set(ENV{CMAKE_EXPORT_COMPILE_COMMANDS} TRUE)
 set(CLANG_TIDY_CHECKS *,-llvm-include-order,-fuchsia-default-arguments,-clang-diagnostic-error,-misc-unused-parameters,-llvm-namespace-comment,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-google-runtime-references,-cppcoreguidelines-owning-memory)
 option(USE_LINTERS "Should compilation use linters?" ON)
 target_compile_features(dlog PUBLIC cxx_std_17)
+target_link_libraries(dlog -lstdc++fs)
+
+CHECK_INCLUDE_FILE_CXX(windows.h IS_WINDOWS)
+
+if (IS_WINDOWS)
+    add_compile_definitions(IS_WINDOWS)
+endif()
 
 if (USE_LINTERS)
     find_program(CLANG_TIDY NAMES clang-tidy-7 clang-tidy-6.0 clang-tidy-5.0 clang-tidy-4.0 clang-tidy)
