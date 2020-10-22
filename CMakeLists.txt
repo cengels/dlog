@@ -56,7 +56,13 @@ if (USE_LINTERS)
 endif()
 
 if (NOT EXISTS "${CMAKE_SOURCE_DIR}/libs/cxxopts.hpp")
+    message(STATUS "Downloading cxxopts.hpp from https://raw.githubusercontent.com/jarro2783/cxxopts/master/include/cxxopts.hpp...")
     file(DOWNLOAD "https://raw.githubusercontent.com/jarro2783/cxxopts/master/include/cxxopts.hpp" "${CMAKE_SOURCE_DIR}/libs/cxxopts.hpp")
+endif()
+
+if (NOT EXISTS "${CMAKE_SOURCE_DIR}/libs/rang.hpp")
+    message(STATUS "Downloading rang.hpp from https://raw.githubusercontent.com/agauniyal/rang/master/include/rang.hpp...")
+    file(DOWNLOAD "https://raw.githubusercontent.com/agauniyal/rang/master/include/rang.hpp" "${CMAKE_SOURCE_DIR}/libs/rang.hpp")
 endif()
 
 include_directories(dlog PUBLIC "${PROJECT_SOURCE_DIR}" "${PROJECT_SOURCE_DIR}/libs")
