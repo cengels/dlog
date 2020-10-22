@@ -1,5 +1,6 @@
 #include <optional>
 #include <experimental/filesystem>
+#include <fstream>
 
 #pragma once
 
@@ -37,4 +38,10 @@ namespace files {
 
     /** Accepts changes made to a file previously prepared for write by removing the associated .tmp file. */
     void accept_changes(const std::experimental::filesystem::path& path);
+
+    /**
+     * Gets the last line of the specified file stream
+     * or an empty string if anything goes wrong.
+     */
+    std::string get_last_line(std::ifstream& stream);
 }

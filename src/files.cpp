@@ -136,3 +136,31 @@ void files::restore(const fs::path& path)
         fs::remove(path);
     }
 }
+
+std::string files::get_last_line(std::ifstream& stream)
+{
+    if (stream.fail() || !stream.is_open()) {
+        return std::string();
+    }
+
+    stream.seekg(0, std::ios_base::end);
+
+    char character;
+
+    do {
+        stream.seekg(-2, std::ios_base::cur);
+
+        if (stream.tellg() <= 0) {
+            // Reached beginning of file
+            stream.seekg(0);
+            break;
+        }
+
+        stream.get(character);
+    } while (character != '\n');
+
+    std::string line;
+    std::getline(stream, line);
+
+    return line;
+}

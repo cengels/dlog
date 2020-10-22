@@ -1,6 +1,6 @@
 #include "start.h"
 #include "version.h"
-#include "../config.h"
+#include "../entries.h"
 #include "subcommands.h"
 
 cxxopts::Options subcommands::start::options() const
@@ -18,7 +18,17 @@ cxxopts::Options subcommands::start::options() const
 
 int subcommands::start::run(const cxxopts::ParseResult& parsedOptions)
 {
-    std::cout << "confirm_new: " << std::boolalpha << config::config().confirm_new << std::endl;
+    auto last = entries::last();
+    std::cout << "from: [" << last.from << "]\n"
+              "to: [" << last.to << "]\n"
+              "activity: [" << last.activity << "]\n"
+              "project: [" << last.project << "]\n";
+
+    for (const auto& tag : last.tags) {
+        std::cout << "[" << tag << "]";
+    }
+
+    std::cout << std::endl;
 
     // Prints help
     // return subcommands::subcommand::run(parsedOptions);
