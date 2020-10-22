@@ -82,6 +82,11 @@ static void save_config()
 {
 }
 
+bool config::available()
+{
+    return !config::path().empty();
+}
+
 const config::structure& config::config()
 {
     if (!m_config.has_value()) {

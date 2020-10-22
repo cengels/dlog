@@ -16,6 +16,9 @@ namespace config {
         bool confirm_new = false;
     };
 
+    /** Returns true if the config file exists or can be created. */
+    bool available();
+
     /** Gets the config, loading it from the file system if it hasn't been already. */
     const config::structure& config();
 
