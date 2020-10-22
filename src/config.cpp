@@ -63,11 +63,11 @@ static config::structure load_config_file()
     config::structure structure;
     const auto path = config::path();
 
-    if (!path.has_value()) {
+    if (path.empty()) {
         return structure;
     }
 
-    std::ifstream in(path->c_str());
+    std::ifstream in(path.c_str());
 
     if (in.good()) {
         parse_config(in, structure);
@@ -91,7 +91,7 @@ const config::structure& config::config()
     return *m_config;
 }
 
-const std::optional<std::experimental::filesystem::path> config::path()
+const std::experimental::filesystem::path config::path()
 {
     return files::dlog_file("dlog.config");
 }
