@@ -35,7 +35,7 @@ static entries::entry parse_entry(const cxxopts::PositionalList& positionals)
         if (!is_valid(positional)) {
             std::cout << "Invalid input: \"";
             format::colorize::activity(std::cout, positional);
-            std::cout << "\"\nCommas and quotes are not allowed.";
+            std::cout << "\"\nCommas and quotes are not allowed." << std::endl;
 
             return entries::entry();
         }
@@ -91,7 +91,7 @@ int subcommands::fill::run(const cxxopts::ParseResult& parsedOptions)
         format::colorize::command(std::cout, "dlog fill");
         std::cout << ". Call ";
         format::colorize::command(std::cout, "dlog start");
-        std::cout << " to create one.";
+        std::cout << " to create one." << std::endl;
 
         return 2;
     }
@@ -99,28 +99,26 @@ int subcommands::fill::run(const cxxopts::ParseResult& parsedOptions)
     if (last.complete()) {
         // append new entry
         entry.from = last.to;
-
-        if (!entry.valid()) {
-            return 1;
-        }
-
-        entries::write(entry);
-
-        std::cout << "Filled ";
-        format::entry(std::cout, entry);
-        std::cout << "." << std::endl;
     } else {
         // overwrite last entry
         entry.from = last.from;
-
-        if (!entry.valid()) {
-            return 1;
-        }
-
-        std::cout << "Filled ";
-        format::entry(std::cout, entry);
-        std::cout << "." << std::endl;
     }
+
+    if (!entry.valid()) {
+        std::cout << "A time entry cannot be in the future." << std::endl;
+
+        return 1;
+    }
+
+    if (last.complete()) {
+        entries::write(entry);
+    } else {
+        entries::overwrite_last(entry);
+    }
+
+    std::cout << "Filled ";
+    format::entry(std::cout, entry);
+    std::cout << "." << std::endl;
 
     return 0;
 }

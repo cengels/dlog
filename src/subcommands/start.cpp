@@ -45,7 +45,7 @@ int subcommands::start::run(const cxxopts::ParseResult& parsedOptions)
         return 1;
     }
 
-    std::cout << "Started a new incomplete time entry at ";
+    std::cout << "Started a new incomplete time entry ";
     format::colorize::time(std::cout, format::as_local_time_string(entry.from));
     std::cout << std::endl;
 

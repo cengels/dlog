@@ -51,4 +51,10 @@ namespace entries {
      * and returns a value indicating whether the operation was successful.
      */
     bool write(const entries::entry& entry);
+
+    /**
+     * Overwrites the last entry in the entries file
+     * and returns a value indicating whether the operation was successful.
+     */
+    bool overwrite_last(const entries::entry& entry);
 }

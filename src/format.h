@@ -10,6 +10,7 @@ namespace format {
         std::ostream& activity(std::ostream& stream, const std::string& string);
         std::ostream& project(std::ostream& stream, const std::string& string);
         std::ostream& time(std::ostream& stream, const std::string& string);
+        std::ostream& duration(std::ostream& stream, const std::string& string);
         std::ostream& tag(std::ostream& stream, const std::string& string);
         std::ostream& command(std::ostream& stream, const std::string& string);
     }
@@ -19,6 +20,11 @@ namespace format {
      * in the format of hours:minutes:seconds.
      */
     std::string as_local_time_string(const time_t& time);
+
+    /**
+     * Formats a POSIX time duration as a local duration string.
+     */
+    std::string as_duration(const time_t& duration);
 
     /** Writes a formatted time entry to the output stream. */
     std::ostream& entry(std::ostream& stream, const entries::entry& entry);

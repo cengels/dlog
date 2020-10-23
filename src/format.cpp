@@ -2,6 +2,10 @@
 #include "rang.hpp"
 #include "format.h"
 
+namespace {
+    constexpr int TIME_CHAR_COUNT = 2;
+}
+
 std::ostream& format::colorize::error(std::ostream& stream, const std::string& string)
 {
     return stream << rang::fg::red << string << rang::fg::reset;
@@ -20,6 +24,11 @@ std::ostream& format::colorize::activity(std::ostream& stream, const std::string
 std::ostream& format::colorize::time(std::ostream& stream, const std::string& string)
 {
     return stream << rang::fg::magenta << string << rang::fg::reset;
+}
+
+std::ostream& format::colorize::duration(std::ostream& stream, const std::string& string)
+{
+    return stream << rang::fgB::magenta << string << rang::fg::reset;
 }
 
 std::ostream& format::colorize::tag(std::ostream& stream, const std::string& string)
@@ -50,6 +59,11 @@ std::string format::as_local_time_string(const time_t& time)
     tm date;
     localtime_r(&time, &date);
     const time_t now_t = std::time(nullptr);
+
+    if (now_t - 10 <= time) {
+        return "now";
+    }
+
     tm now;
     localtime_r(&now_t, &now);
 
@@ -75,6 +89,46 @@ std::string format::as_local_time_string(const time_t& time)
     return result;
 }
 
+static std::string pad(const std::string& string, int min_chars)
+{
+    if (string.length() >= min_chars) {
+        return string;
+    }
+
+    std::string result = std::string(min_chars - string.length(), '0');
+    result.append(string);
+
+    return result;
+}
+
+std::string format::as_duration(const time_t& duration)
+{
+    std::string result;
+    using days = std::chrono::duration<int, std::ratio<86400>>;
+    using hours = std::chrono::hours;
+    using minutes = std::chrono::minutes;
+    using seconds = std::chrono::seconds;
+
+    const seconds s = seconds(duration);
+    const minutes m = std::chrono::duration_cast<minutes>(s);
+    const hours h = std::chrono::duration_cast<hours>(m);
+    const days d = std::chrono::duration_cast<days>(h);
+
+    if (d.count() >= 1) {
+        result.append(std::to_string(d.count()));
+        result.append("d ");
+    }
+
+    result.append(pad(std::to_string(h.count() % 24), TIME_CHAR_COUNT));
+    result.append("h ");
+    result.append(pad(std::to_string(m.count() % 60), TIME_CHAR_COUNT));
+    result.append("m ");
+    result.append(pad(std::to_string(s.count() % 60), TIME_CHAR_COUNT));
+    result.append("s");
+
+    return result;
+}
+
 std::ostream& format::entry(std::ostream& stream, const entries::entry& entry)
 {
     stream << "activity ";
@@ -85,9 +139,9 @@ std::ostream& format::entry(std::ostream& stream, const entries::entry& entry)
         format::colorize::project(stream, entry.project);
     }
 
-    stream << " ";
-
     if (!entry.tags.empty()) {
+        stream << " ";
+
         std::string tag_string = "[";
 
         for (const std::string& tag : entry.tags) {
@@ -108,6 +162,12 @@ std::ostream& format::entry(std::ostream& stream, const entries::entry& entry)
 
     stream << " to ";
     format::colorize::time(stream, format::as_local_time_string(entry.to));
+
+    stream << " ";
+    std::string duration = "(";
+    duration.append(format::as_duration(entry.to - entry.from));
+    duration.append(")");
+    format::colorize::duration(stream, duration);
 
     return stream;
 }

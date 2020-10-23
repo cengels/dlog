@@ -154,3 +154,52 @@ bool entries::write(const entries::entry& entry)
     files::accept_changes(file_path);
     return true;
 }
+
+bool entries::overwrite_last(const entries::entry& entry)
+{
+    if (!entry.valid()) {
+        return false;
+    }
+
+    const std::experimental::filesystem::path& file_path = entries_file_path();
+
+    if (file_path.empty()) {
+        return false;
+    }
+
+    if (!files::prepare_for_write(file_path)) {
+        return false;
+    }
+
+    std::fstream entries_file(file_path.c_str(), std::ios::in | std::ios::out);
+
+    std::string line;
+    while (files::get_previous_line(entries_file, line)) {
+        if (!line.empty()) {
+            // Because files::get_previous_line() leaves the
+            // stream position at the end of the line before the line written to result,
+            // we need to manually go back to the beginning of the resulting line first.
+
+            char c;
+
+            entries_file.get(c);
+
+            if (c == '\r') {
+                entries_file.get(c);
+            }
+
+            break;
+        }
+    }
+
+    entries::serialize(entries_file, entry);
+    entries_file << "\n";
+
+    if (entries_file.fail()) {
+        files::restore(file_path);
+        return false;
+    }
+
+    files::accept_changes(file_path);
+    return true;
+}

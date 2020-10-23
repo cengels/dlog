@@ -188,11 +188,6 @@ bool files::get_previous_line(std::istream& stream, std::string& result)
     while (true) {
         stream.seekg(-1, std::ios_base::cur);
 
-        if (stream.tellg() <= 0) {
-            // Reached beginning of file
-            break;
-        }
-
         character = stream.peek();
 
         if (character != '\n') {
@@ -212,10 +207,16 @@ bool files::get_previous_line(std::istream& stream, std::string& result)
 
             break;
         }
+
+        if (stream.tellg() <= 0) {
+            // Reached beginning of file
+            break;
+        }
     }
 
     if (stream.tellg() <= 0) {
-        stream.seekg(0);
+        stream.clear();
+        stream.seekg(0, std::ios_base::beg);
         return false;
     }
 
@@ -241,12 +242,10 @@ void files::append_to_last_line(std::fstream& stream)
 
             if (c == '\r') {
                 stream.get(c);
-            } else if (c != '\n') {
-                stream.seekg(-1, std::ios_base::cur);
             }
 
-            // After that, we iterate through that line again until we find either
-            // the end of file or the next newline token.
+            // Went one too far, so go back one.
+            // stream.seekg(-1, std::ios_base::cur);
 
             do {
                 previous_position = stream.tellg();
