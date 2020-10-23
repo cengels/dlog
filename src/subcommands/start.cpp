@@ -27,8 +27,12 @@ int subcommands::start::run(const cxxopts::ParseResult& parsedOptions)
     const auto last = entries::last();
 
     if (last.valid() && !last.complete()) {
-        std::cout << "You still have an unstopped time entry!\n"
-                     "Use dlog fill to stop the last time entry first."
+        std::cout << "You still have an unstopped time entry started at ";
+        format::colorize::time(std::cout, format::as_local_time_string(last.from));
+        std::cout << ".\n"
+                     "Use ";
+        format::colorize::command(std::cout, "dlog fill");
+        std::cout << " to stop the last time entry first."
                   << std::endl;
 
         return 1;
@@ -38,15 +42,15 @@ int subcommands::start::run(const cxxopts::ParseResult& parsedOptions)
     entry.from = std::time(nullptr);
 
     if (!entries::write(entry)) {
-        std::cerr << rang::fg::red << "Error: Couldn't write to entries file.\n"
-                     "Please check that you have write permission."
+        std::cerr << rang::fg::red << "Error: " << rang::fgB::red << "Couldn't write to entries file.\n"
+                     "Do you have write permission?"
                   << rang::fg::reset << std::endl;
         return 1;
     }
 
-    std::cout << "Started a new incomplete time entry at "
-              << format::as_local_time_string(entry.from)
-              << std::endl;
+    std::cout << "Started a new incomplete time entry at ";
+    format::colorize::time(std::cout, format::as_local_time_string(entry.from));
+    std::cout << std::endl;
 
     return 0;
 }
