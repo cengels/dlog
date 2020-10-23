@@ -9,11 +9,8 @@ cxxopts::Options subcommands::start::options() const
 {
     auto opts = subcommands::subcommand::options();
 
-    // opts.add_options()
-    //     ("v,version", "Prints the installed version.")
-    //     ("h,help", "Prints all available commands.");
-
-    // opts.custom_help("[-v | -h]");
+    opts.add_options()
+        ("h,help", "Prints all available options.");
 
     return opts;
 }
@@ -62,7 +59,7 @@ std::string subcommands::start::command() const
 
 std::string subcommands::start::syntax() const
 {
-    return std::string();
+    return "[-h]";
 }
 
 std::string subcommands::start::description() const
