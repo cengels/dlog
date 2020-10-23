@@ -15,12 +15,19 @@ namespace config {
          */
         bool confirm_new = false;
         /**
-         * The time format to use when outputting dates and times.
+         * The time format to use when outputting times.
          * This must conform to the format directives specified by https://strftime.org.
          *
          * Default is a time format specifier in the format of %H:%M:%S.
          */
         std::string time_format = "%H:%M:%S";
+        /**
+         * The date format to use when outputting dates.
+         * This must conform to the format directives specified by https://strftime.org.
+         *
+         * Default is the ISO time format specifier in the format of %Y-%m-%d.
+         */
+        std::string date_format = "%Y-%m-%d";
     };
 
     /** Returns true if the config file exists or can be created. */

@@ -1,5 +1,6 @@
 #include <string>
 #include <time.h>
+#include "entries.h"
 
 #pragma once
 
@@ -18,4 +19,7 @@ namespace format {
      * in the format of hours:minutes:seconds.
      */
     std::string as_local_time_string(const time_t& time);
+
+    /** Writes a formatted time entry to the output stream. */
+    std::ostream& entry(std::ostream& stream, const entries::entry& entry);
 }
