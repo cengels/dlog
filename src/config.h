@@ -14,6 +14,13 @@ namespace config {
          * creating new items.
          */
         bool confirm_new = false;
+        /**
+         * The time format to use when outputting dates and times.
+         * This must conform to the format directives specified by https://strftime.org.
+         *
+         * Default is a time format specifier in the format of %H:%M:%S.
+         */
+        std::string time_format = "%H:%M:%S";
     };
 
     /** Returns true if the config file exists or can be created. */

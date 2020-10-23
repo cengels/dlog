@@ -40,8 +40,46 @@ namespace files {
     void accept_changes(const std::experimental::filesystem::path& path);
 
     /**
-     * Gets the last line of the specified file stream
-     * or an empty string if anything goes wrong.
+     * Writes the last line of the specified file stream to result
+     * and returns a value indicating whether the beginning was reached.
      */
-    std::string get_last_line(std::ifstream& stream);
+    bool get_last_line(std::istream& stream, std::string& result);
+
+    /**
+     * Writes the last non-empty line of the specified file stream to result
+     * and returns a value indicating whether the beginning was reached.
+     *
+     * If all lines are empty, result will also be empty.
+     */
+    bool get_last_nonempty_line(std::istream& stream, std::string& result);
+
+    /**
+     * Writes the previous line in the specified file stream
+     * into result and returns a value indicating whether the beginning
+     * was reached.
+     *
+     * If the stream is positioned at the beginning,
+     * positions the stream at the end and writes the last line instead.
+     */
+    bool get_previous_line(std::istream& stream, std::string& result);
+
+    /**
+     * Sets the stream position to the beginning of the first empty line
+     * starting from the end of the file. This places the stream in a
+     * state where any subsequent writes will append to the end of the file
+     * without overwriting any meaningful content.
+     *
+     * If the file does not end in a blank line, this function inserts one,
+     * thus guaranteeing that subsequent writes do not write to the end
+     * of a line with existing content.
+     *
+     * If there are multiple blank lines at the end of the file, this function
+     * sets the stream position to the beginning of the first of them. This
+     * may result in the remaining blank lines being overwritten by subsequent
+     * writes.
+     *
+     * For this function to work, the file stream has to be opened using both
+     * the in and out flags.
+     */
+    void append_to_last_line(std::fstream& stream);
 }

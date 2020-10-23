@@ -16,7 +16,7 @@ namespace entries {
         time_t to;
         /**
          * The activity committed during this time entry.
-         * Must not be an empty string.
+         * Must not be an empty string unless the time entry is incomplete.
          */
         std::string activity;
         /**
@@ -41,8 +41,14 @@ namespace entries {
     };
 
     /** Gets a copy of the last written time entry. */
-    std::string serialize(const entries::entry& entry);
+    void serialize(std::ostream& stream, const entries::entry& entry);
 
     /** Gets a copy of the last written time entry. */
     entries::entry last();
+
+    /**
+     * Appends a single entry to the back of the entries file
+     * and returns a value indicating whether the operation was successful.
+     */
+    bool write(const entries::entry& entry);
 }

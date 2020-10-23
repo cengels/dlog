@@ -110,15 +110,15 @@ bool files::prepare_for_write(const fs::path& path)
     }
 
     fs::path tmp(path);
-    tmp.append(".tmp");
+    tmp.concat(".tmp");
 
-    return fs::copy_file(path, tmp, fs::copy_options::update_existing);
+    return fs::copy_file(path, tmp, fs::copy_options::overwrite_existing);
 }
 
 void files::accept_changes(const fs::path& path)
 {
     fs::path tmp(path);
-    tmp.append(".tmp");
+    tmp.concat(".tmp");
 
     fs::remove(tmp);
 }
@@ -126,7 +126,7 @@ void files::accept_changes(const fs::path& path)
 void files::restore(const fs::path& path)
 {
     fs::path tmp(path);
-    tmp.append(".tmp");
+    tmp.concat(".tmp");
 
     if (fs::exists(tmp)) {
         fs::copy_file(tmp, path, fs::copy_options::overwrite_existing);
@@ -137,30 +137,134 @@ void files::restore(const fs::path& path)
     }
 }
 
-std::string files::get_last_line(std::ifstream& stream)
+bool files::get_last_line(std::istream& stream, std::string& result)
 {
-    if (stream.fail() || !stream.is_open()) {
-        return std::string();
+    if (stream.fail()) {
+        return false;
     }
 
     stream.seekg(0, std::ios_base::end);
 
+    if (stream.tellg() == 0) {
+        // File is empty
+        result.erase();
+        return false;
+    }
+
+    return files::get_previous_line(stream, result);
+}
+
+bool files::get_last_nonempty_line(std::istream& stream, std::string& result)
+{
+    if (stream.fail()) {
+        return false;
+    }
+
+    stream.seekg(0, std::ios_base::beg);
+
+    while (files::get_previous_line(stream, result)) {
+        if (!result.empty()) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool files::get_previous_line(std::istream& stream, std::string& result)
+{
+    if (stream.fail()) {
+        return false;
+    }
+
+    if (stream.tellg() == 0) {
+        return files::get_last_line(stream, result);
+    }
+
     char character;
 
-    do {
-        stream.seekg(-2, std::ios_base::cur);
+    result.erase();
+
+    while (true) {
+        stream.seekg(-1, std::ios_base::cur);
 
         if (stream.tellg() <= 0) {
             // Reached beginning of file
-            stream.seekg(0);
             break;
         }
 
-        stream.get(character);
-    } while (character != '\n');
+        character = stream.peek();
 
+        if (character != '\n') {
+            result.insert(0, 1, character);
+        } else {
+            if (stream.tellg() <= 0) {
+                // Reached beginning of file
+                break;
+            }
+
+            stream.seekg(-1, std::ios_base::cur);
+            character = stream.peek();
+
+            if (character != '\r') {
+                stream.seekg(1, std::ios_base::cur);
+            }
+
+            break;
+        }
+    }
+
+    if (stream.tellg() <= 0) {
+        stream.seekg(0);
+        return false;
+    }
+
+    return true;
+}
+
+void files::append_to_last_line(std::fstream& stream)
+{
     std::string line;
-    std::getline(stream, line);
+    while (true) {
+        bool beginning_reached = !files::get_previous_line(stream, line);
 
-    return line;
+        if (!line.empty()) {
+            // Found non-empty line, go to end of line and insert new line there
+            char c;
+            int previous_position;
+
+            // Because files::get_previous_line() leaves the
+            // stream position at the end of the line before the line written to result,
+            // we need to manually go back to the beginning of the resulting line first.
+
+            stream.get(c);
+
+            if (c == '\r') {
+                stream.get(c);
+            } else if (c != '\n') {
+                stream.seekg(-1, std::ios_base::cur);
+            }
+
+            // After that, we iterate through that line again until we find either
+            // the end of file or the next newline token.
+
+            do {
+                previous_position = stream.tellg();
+                stream.get(c);
+            } while (!stream.eof() && c != '\n');
+
+            if (stream.eof()) {
+                stream.clear();
+                stream.seekg(previous_position, std::ios_base::beg);
+                stream << "\n";
+            }
+
+            break;
+        }
+
+        if (beginning_reached) {
+            // File is empty, seek position should remain 0
+            break;
+        }
+    }
 }
