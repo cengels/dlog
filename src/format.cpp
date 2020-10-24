@@ -87,7 +87,7 @@ std::string format::as_local_time_string(const time_t& time)
 
 static std::string pad(const std::string& string, int min_chars)
 {
-    if (string.length() >= min_chars) {
+    if (string.length() >= min_chars || string == "0") {
         return string;
     }
 
