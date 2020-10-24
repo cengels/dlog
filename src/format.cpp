@@ -60,10 +60,6 @@ std::string format::as_local_time_string(const time_t& time)
     localtime_r(&time, &date);
     const time_t now_t = std::time(nullptr);
 
-    if (now_t - 10 <= time) {
-        return "now";
-    }
-
     tm now;
     localtime_r(&now_t, &now);
 
