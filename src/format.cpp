@@ -77,7 +77,7 @@ std::string format::as_local_time_string(const time_t& time)
         strftime(date_string, sizeof(date_string), config::config().date_format.c_str(), &date);
 
         result.append(date_string);
-        result.append("T");
+        result.append(" ");
     }
 
     result.append(time_string);
