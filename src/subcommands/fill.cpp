@@ -78,7 +78,10 @@ int subcommands::fill::run(const cxxopts::ParseResult& parsedOptions)
     const auto& positionals = parsedOptions.unmatched();
 
     if (positionals.empty()) {
-        return subcommands::subcommand::run(parsedOptions);
+        std::cout << "No activity specified. Use ";
+        format::colorize::command(std::cout, "dlog fill -h");
+        std::cout << " for usage syntax." << std::endl;
+        return 1;
     }
 
     entries::entry entry = parse_entry(positionals);
