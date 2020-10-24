@@ -15,6 +15,11 @@ namespace config {
          */
         bool confirm_new = false;
         /**
+         * If true, two subsequent entries whose contents are equivalent and are less than
+         * five seconds apart will be automatically merged into a single entry.
+         */
+        bool auto_merge = false;
+        /**
          * The time format to use when outputting times.
          * This must conform to the format directives specified by https://strftime.org.
          *
