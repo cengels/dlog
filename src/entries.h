@@ -57,4 +57,9 @@ namespace entries {
      * and returns a value indicating whether the operation was successful.
      */
     bool overwrite_last(const entries::entry& entry);
+
+    /**
+     * Reads all entries from the back of the entries file and returns them.
+     */
+    std::vector<entries::entry> read_all(uint limit = 0);
 }

@@ -203,3 +203,36 @@ bool entries::overwrite_last(const entries::entry& entry)
     files::accept_changes(file_path);
     return true;
 }
+
+std::vector<entries::entry> entries::read_all(uint limit)
+{
+    std::vector<entries::entry> entries;
+    const std::experimental::filesystem::path& file_path = entries_file_path();
+
+    if (file_path.empty()) {
+        return entries;
+    }
+
+    std::ifstream entries_file(file_path.c_str());
+    std::string line;
+    uint i = 0;
+    files::get_last_line(entries_file, line);
+
+    do {
+        if (line.empty()) {
+            continue;
+        }
+
+        entries::entry entry = parse(line);
+
+        if (entry.valid()) {
+            entries.push_back(entry);
+        }
+
+        i++;
+    } while (files::get_previous_line(entries_file, line) && (limit == 0 || i < limit));
+
+    entries_file.close();
+
+    return entries;
+}

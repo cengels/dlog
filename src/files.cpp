@@ -267,3 +267,37 @@ void files::append_to_last_line(std::fstream& stream)
         }
     }
 }
+
+/**
+ * Opens the specified path in the default system pager.
+ * If no pager can be found, returns false.
+ */
+bool files::open_in_pager(const std::experimental::filesystem::path& path)
+{
+    std::string pager = getenv("PAGER");
+
+    if (pager.empty()) {
+        // -r means "interpret colors"
+        pager = "less -r";
+    } else {
+        if (pager.find("less") != std::string::npos && pager.find("-r") == std::string::npos) {
+            pager.append(" -r");
+        }
+    }
+
+    std::string command = pager;
+    command.append(" ");
+    command.append(path.c_str());
+
+    if (system(command.c_str()) == 0) {
+        std::cout << command << std::endl;
+        return true;
+    }
+
+    command = "more";
+    command.append(" ");
+    command.append(path.c_str());
+
+        std::cout << command << std::endl;
+    return system(command.c_str()) == 0;
+}

@@ -2,6 +2,7 @@
 #include "main.h"
 #include "start.h"
 #include "fill.h"
+#include "log.h"
 
 namespace {
     std::vector<subcommands::subcommand*>* vector = nullptr;
@@ -13,7 +14,8 @@ std::vector<subcommands::subcommand*>& subcommands::subcommands()
         vector = new std::vector<subcommands::subcommand*>{
             new subcommands::main(),
             new subcommands::start(),
-            new subcommands::fill()
+            new subcommands::fill(),
+            new subcommands::log()
         };
     }
 

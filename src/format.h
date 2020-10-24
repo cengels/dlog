@@ -28,4 +28,16 @@ namespace format {
 
     /** Writes a formatted time entry to the output stream. */
     std::ostream& entry(std::ostream& stream, const entries::entry& entry);
+
+    /** Writes a formatted time entry table to the output stream. */
+    std::ostream& entries(std::ostream& stream, std::vector<entries::entry>::const_iterator begin, const std::vector<entries::entry>::const_iterator end);
+
+    /** Writes a formatted time entry table to the output stream. */
+    std::ostream& entries(std::ostream& stream, std::vector<entries::entry>::const_reverse_iterator begin, const std::vector<entries::entry>::const_reverse_iterator end);
+
+    /**
+     * Attempts to convert a string to an int and returns a value indicating
+     * whether the operation succeeded.
+     */
+    bool to_int(const std::string& string, int& result);
 }

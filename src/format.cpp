@@ -167,3 +167,71 @@ std::ostream& format::entry(std::ostream& stream, const entries::entry& entry)
 
     return stream;
 }
+
+std::ostream& format::entries(std::ostream& stream, std::vector<entries::entry>::const_reverse_iterator begin, const std::vector<entries::entry>::const_reverse_iterator end)
+{
+    // rang automatically ignores color codes
+    // if the output stream is a file, so we
+    // have to override this behaviour here
+    // to show colours in the pager.
+    rang::setControlMode(rang::control::Force);
+
+    for (; begin != end; begin++) {
+        const entries::entry& entry = *begin;
+        format::entry(stream, entry);
+        stream << "\n";
+    }
+
+    rang::setControlMode(rang::control::Auto);
+
+    return stream;
+}
+
+std::ostream& format::entries(std::ostream& stream, std::vector<entries::entry>::const_iterator begin, const std::vector<entries::entry>::const_iterator end)
+{
+    // see above
+    rang::setControlMode(rang::control::Force);
+
+    for (; begin != end; begin++) {
+        const entries::entry& entry = *begin;
+        format::entry(stream, entry);
+        stream << "\n";
+    }
+
+    rang::setControlMode(rang::control::Auto);
+
+    return stream;
+}
+
+bool format::to_int(const std::string& string, int& result)
+{
+    if (string.empty()) {
+        return false;
+    }
+
+    std::string input;
+    bool is_negative = false;
+
+    if (string.at(0) == '+') {
+        input = string.substr(1);
+    } else if (string.at(0) == '-') {
+        input = string.substr(1);
+        is_negative = true;
+    } else {
+        input = string;
+    }
+
+    bool digits_only = (input.find_first_not_of("0123456789") == std::string::npos);
+
+    if (digits_only) {
+        result = std::stoi(input);
+
+        if (is_negative) {
+            result = -result;
+        }
+
+        return true;
+    }
+
+    return false;
+}

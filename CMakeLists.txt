@@ -14,6 +14,7 @@ add_executable(dlog "src/main.cpp"
     "src/subcommands/main.h" "src/subcommands/main.cpp"
     "src/subcommands/start.h" "src/subcommands/start.cpp"
     "src/subcommands/fill.h" "src/subcommands/fill.cpp"
+    "src/subcommands/log.h" "src/subcommands/log.cpp"
 )
 configure_file(version.h.in version.h)
 

@@ -82,4 +82,7 @@ namespace files {
      * the in and out flags.
      */
     void append_to_last_line(std::fstream& stream);
+
+    /** Opens the specified path in the default system pager. */
+    bool open_in_pager(const std::experimental::filesystem::path& path);
 }
