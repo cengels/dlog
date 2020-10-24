@@ -71,7 +71,7 @@ std::string format::as_local_time_string(const time_t& time)
 
     if (is_yesterday(date, now)) {
         result.append("yesterday at ");
-    } else if (date.tm_yday != now.tm_yday && date.tm_year != now.tm_year) {
+    } else if (date.tm_yday != now.tm_yday || date.tm_year != now.tm_year) {
         char date_string[30];
 
         strftime(date_string, sizeof(date_string), config::config().date_format.c_str(), &date);
