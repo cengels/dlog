@@ -8,20 +8,53 @@ namespace {
     std::optional<config::structure> m_config;
 }
 
+static bool parse_bool(std::istream& in, bool default_value = false)
+{
+    bool result = false;
+    in >> std::boolalpha >> result;
+
+    if (in.fail()) {
+        return default_value;
+    }
+
+    return result;
+}
+
+static std::string parse_string(std::istream& in, const std::string& default_value = "")
+{
+    std::string result;
+    char c;
+
+    do {
+        in.get(c);
+
+        if (c == '"') {
+            continue;
+        }
+
+        result.push_back(c);
+    } while (c != '\n' && c != '\r' && !in.eof());
+
+    if (result.empty()) {
+        return default_value;
+    }
+
+    return result;
+}
+
 static bool parse_property(std::istream& in, config::structure& structure, const std::string& property)
 {
     if (property == "confirm_new") {
-        bool confirm_new = false;
-        in >> std::boolalpha >> confirm_new;
-
-        if (in.fail()) {
-            return false;
-        }
-
-        structure.confirm_new = confirm_new;
+        structure.confirm_new = parse_bool(in);
+    } else if (property == "auto_merge") {
+        structure.auto_merge = parse_bool(in);
+    } else if (property == "time_format") {
+        structure.time_format = parse_string(in, "%H:%M:%S");
+    } else if (property == "date_format") {
+        structure.date_format = parse_string(in, "%Y-%m-%d");
     }
 
-    return true;
+    return in.good() || in.eof();
 }
 
 static void parse_config(std::istream& in, config::structure& structure)
