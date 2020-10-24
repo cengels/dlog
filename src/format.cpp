@@ -187,22 +187,6 @@ std::ostream& format::entries(std::ostream& stream, std::vector<entries::entry>:
     return stream;
 }
 
-std::ostream& format::entries(std::ostream& stream, std::vector<entries::entry>::const_iterator begin, const std::vector<entries::entry>::const_iterator end)
-{
-    // see above
-    rang::setControlMode(rang::control::Force);
-
-    for (; begin != end; begin++) {
-        const entries::entry& entry = *begin;
-        format::entry(stream, entry);
-        stream << "\n";
-    }
-
-    rang::setControlMode(rang::control::Auto);
-
-    return stream;
-}
-
 bool format::to_int(const std::string& string, int& result)
 {
     if (string.empty()) {

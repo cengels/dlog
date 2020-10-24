@@ -30,9 +30,6 @@ namespace format {
     std::ostream& entry(std::ostream& stream, const entries::entry& entry);
 
     /** Writes a formatted time entry table to the output stream. */
-    std::ostream& entries(std::ostream& stream, std::vector<entries::entry>::const_iterator begin, const std::vector<entries::entry>::const_iterator end);
-
-    /** Writes a formatted time entry table to the output stream. */
     std::ostream& entries(std::ostream& stream, std::vector<entries::entry>::const_reverse_iterator begin, const std::vector<entries::entry>::const_reverse_iterator end);
 
     /**
