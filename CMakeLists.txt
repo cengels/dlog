@@ -7,6 +7,7 @@ add_executable(dlog "src/main.cpp"
     "src/commandline.cpp" "src/commandline.h"
     "src/files.h" "src/files.cpp"
     "src/entries.h" "src/entries.cpp"
+    "src/date.h" "src/date.cpp"
     "src/format.h" "src/format.cpp"
     "src/config.h" "src/config.cpp"
     "src/subcommands/subcommands.h" "src/subcommands/subcommands.cpp"
@@ -20,7 +21,7 @@ configure_file(version.h.in version.h)
 
 set(CMAKE_CXX_STANDARD 17)
 set(ENV{CMAKE_EXPORT_COMPILE_COMMANDS} TRUE)
-set(CLANG_TIDY_CHECKS *,-llvm-include-order,-fuchsia-default-arguments,-clang-diagnostic-error,-misc-unused-parameters,-llvm-namespace-comment,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-google-runtime-references,-cppcoreguidelines-owning-memory)
+set(CLANG_TIDY_CHECKS *,-llvm-include-order,-fuchsia-default-arguments,-clang-diagnostic-error,-misc-unused-parameters,-llvm-namespace-comment,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-google-runtime-references,-cppcoreguidelines-owning-memory,-fuchsia-overloaded-operator,-hicpp-signed-bitwise)
 option(USE_LINTERS "Should compilation use linters?" ON)
 target_compile_features(dlog PUBLIC cxx_std_17)
 target_link_libraries(dlog -lstdc++fs)

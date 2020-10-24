@@ -1,6 +1,7 @@
 #include "config.h"
 #include "rang.hpp"
 #include "format.h"
+#include "date.h"
 
 namespace {
     constexpr int TIME_CHAR_COUNT = 2;
@@ -41,40 +42,23 @@ std::ostream& format::colorize::command(std::ostream& stream, const std::string&
     return stream << rang::fg::blue << string << rang::fg::reset;
 }
 
-static bool is_yesterday(const tm& date, const tm& from_date)
-{
-    if (from_date.tm_year == date.tm_year) {
-        return from_date.tm_yday - 1 == date.tm_yday;
-    }
-
-    if (from_date.tm_year - 1 == date.tm_year) {
-        return from_date.tm_yday == 0 && date.tm_yday == 365;
-    }
-
-    return false;
-}
-
 std::string format::as_local_time_string(const time_t& time)
 {
-    tm date;
-    localtime_r(&time, &date);
-    const time_t now_t = std::time(nullptr);
-
-    tm now;
-    localtime_r(&now_t, &now);
+    date time_date(time);
+    date now_date;
 
     char time_string[30];
 
-    strftime(time_string, sizeof(time_string), config::config().time_format.c_str(), &date);
+    strftime(time_string, sizeof(time_string), config::config().time_format.c_str(), localtime(&time));
 
     std::string result;
 
-    if (is_yesterday(date, now)) {
+    if (now_date.is_yesterday(time_date)) {
         result.append("yesterday at ");
-    } else if (date.tm_yday != now.tm_yday || date.tm_year != now.tm_year) {
+    } else if (now_date != time_date) {
         char date_string[30];
 
-        strftime(date_string, sizeof(date_string), config::config().date_format.c_str(), &date);
+        strftime(date_string, sizeof(date_string), config::config().date_format.c_str(), localtime(&time));
 
         result.append(date_string);
         result.append(" ");
@@ -168,7 +152,7 @@ std::ostream& format::entry(std::ostream& stream, const entries::entry& entry)
     return stream;
 }
 
-std::ostream& format::entries(std::ostream& stream, std::vector<entries::entry>::const_reverse_iterator begin, const std::vector<entries::entry>::const_reverse_iterator end)
+std::ostream& format::entries(std::ostream& stream, std::vector<entries::entry>::const_reverse_iterator begin, const std::vector<entries::entry>::const_reverse_iterator& end)
 {
     // rang automatically ignores color codes
     // if the output stream is a file, so we
