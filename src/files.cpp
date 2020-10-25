@@ -277,11 +277,24 @@ bool files::open_in_pager(const std::experimental::filesystem::path& path)
     std::string pager = getenv("PAGER");
 
     if (pager.empty()) {
-        // -r means "interpret colors"
-        pager = "less -r";
+        pager = "less -r -K -Ps:";
     } else {
-        if (pager.find("less") != std::string::npos && pager.find("-r") == std::string::npos) {
-            pager.append(" -r");
+        if (pager.find("less") != std::string::npos) {
+            // accept colors
+            if (pager.find("-r") == std::string::npos) {
+                pager.append(" -r");
+            }
+
+            // quit on interrupt
+            if (pager.find("-K") == std::string::npos) {
+                pager.append(" -K");
+            }
+
+            // replaces the file name of the temp file
+            // with a simple colon in the less prompt
+            if (pager.find("-Ps") == std::string::npos) {
+                pager.append(" -Ps:");
+            }
         }
     }
 
@@ -298,6 +311,5 @@ bool files::open_in_pager(const std::experimental::filesystem::path& path)
     command.append(" ");
     command.append(path.c_str());
 
-        std::cout << command << std::endl;
     return system(command.c_str()) == 0;
 }
