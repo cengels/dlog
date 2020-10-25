@@ -6,6 +6,7 @@ project(dlog LANGUAGES CXX VERSION 0.0.1)
 add_executable(dlog "src/main.cpp"
     "src/commandline.cpp" "src/commandline.h"
     "src/files.h" "src/files.cpp"
+    "src/entry.h" "src/entry.cpp"
     "src/entries.h" "src/entries.cpp"
     "src/date.h" "src/date.cpp"
     "src/format.h" "src/format.cpp"
