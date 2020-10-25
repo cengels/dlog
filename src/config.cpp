@@ -52,6 +52,8 @@ static bool parse_property(std::istream& in, config::structure& structure, const
         structure.time_format = parse_string(in, "%H:%M:%S");
     } else if (property == "date_format") {
         structure.date_format = parse_string(in, "%Y-%m-%d");
+    } else if (property == "long_date_format") {
+        structure.long_date_format = parse_string(in, "%Y-%m-%d");
     }
 
     return in.good() || in.eof();

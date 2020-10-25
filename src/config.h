@@ -33,6 +33,15 @@ namespace config {
          * Default is the ISO time format specifier in the format of %Y-%m-%d.
          */
         std::string date_format = "%Y-%m-%d";
+        /**
+         * The long date format to use when outputting dates.
+         * This must conform to the format directives specified by https://strftime.org.
+         *
+         * This format is used in the log, for instance.
+         *
+         * Default is a format like "Wednesday, September 9, 2020" (%A, %B %-d, %Y).
+         */
+        std::string long_date_format = "%A, %B %-d, %Y";
     };
 
     /** Returns true if the config file exists or can be created. */

@@ -22,15 +22,20 @@ namespace format {
     std::string as_local_time_string(const time_t& time);
 
     /**
+     * Writes a local time string to the output stream.
+     */
+    std::ostream& local_time(std::ostream& stream, const time_t& time);
+
+    /**
      * Formats a POSIX time duration as a local duration string.
      */
-    std::string as_duration(const time_t& duration);
+    std::string as_duration(const time_t& duration, const bool& always_pad = false);
 
     /** Writes a formatted time entry to the output stream. */
     std::ostream& entry(std::ostream& stream, const entries::entry& entry);
 
     /** Writes a formatted time entry table to the output stream. */
-    std::ostream& entries(std::ostream& stream, std::vector<entries::entry>::const_reverse_iterator begin, const std::vector<entries::entry>::const_reverse_iterator& end);
+    std::ostream& entries(std::ostream& stream, std::vector<entries::entry>::const_iterator begin, const std::vector<entries::entry>::const_iterator& end);
 
     /**
      * Attempts to convert a string to an int and returns a value indicating

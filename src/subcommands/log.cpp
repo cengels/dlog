@@ -44,7 +44,7 @@ int subcommands::log::run(const cxxopts::ParseResult& parsedOptions)
         if (!path.empty()) {
             path.append("dlog_log_output");
             std::ofstream stream(path.c_str(), std::ios_base::trunc);
-            format::entries(stream, entries.rbegin(), entries.rend());
+            format::entries(stream, entries.begin(), entries.end());
             stream.close();
 
             files::open_in_pager(path);
@@ -54,7 +54,7 @@ int subcommands::log::run(const cxxopts::ParseResult& parsedOptions)
         }
     }
 
-    format::entries(std::cout, entries.rbegin(), entries.rend());
+    format::entries(std::cout, entries.begin(), entries.end());
 
     return 0;
 }
