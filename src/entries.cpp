@@ -17,30 +17,6 @@ std::experimental::filesystem::path& entries_file_path()
     return m_entries_file_path;
 }
 
-void entries::serialize(std::ostream& stream, const entries::entry& entry)
-{
-    if (!entry.valid()) {
-        return;
-    }
-
-    stream << entry.from << ","
-           << entry.to << ",\""
-           << entry.activity << "\",\""
-           << entry.project << "\",\"";
-
-    const auto& last = entry.tags.back();
-
-    for (const std::string& tag : entry.tags) {
-        stream << tag;
-
-        if (tag != last) {
-            stream << ",";
-        }
-    }
-
-    stream << "\"";
-}
-
 static entries::entry parse(const std::string& line)
 {
     if (line.empty()) {
@@ -127,8 +103,7 @@ bool entries::write(const entries::entry& entry)
     std::fstream entries_file(file_path.c_str(), std::ios::in | std::ios::out);
     files::append_to_last_line(entries_file);
 
-    entries::serialize(entries_file, entry);
-    entries_file << "\n";
+    entries_file << entry << "\n";
 
     if (entries_file.fail()) {
         files::restore(file_path);
@@ -176,8 +151,7 @@ bool entries::overwrite_last(const entries::entry& entry)
         }
     }
 
-    entries::serialize(entries_file, entry);
-    entries_file << "\n";
+    entries_file << entry << "\n";
 
     if (entries_file.fail()) {
         files::restore(file_path);

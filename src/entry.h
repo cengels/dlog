@@ -39,5 +39,7 @@ namespace entries {
          * if it has both a start and an end point.
          */
         bool complete() const;
+
+        friend std::ostream& operator<<(std::ostream& stream, const entry& entry);
     };
 }

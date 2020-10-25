@@ -7,9 +7,6 @@
 
 namespace entries {
     /** Gets a copy of the last written time entry. */
-    void serialize(std::ostream& stream, const entries::entry& entry);
-
-    /** Gets a copy of the last written time entry. */
     entries::entry last();
 
     /**

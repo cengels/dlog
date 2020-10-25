@@ -15,3 +15,29 @@ bool entries::entry::complete() const
         && this->to > 0
         && !this->activity.empty();
 }
+
+std::ostream& entries::operator<<(std::ostream& stream, const entries::entry& entry)
+{
+    if (!entry.valid()) {
+        return stream;
+    }
+
+    stream << entry.from << ","
+           << entry.to << ",\""
+           << entry.activity << "\",\""
+           << entry.project << "\",\"";
+
+    const auto& last = entry.tags.back();
+
+    for (const std::string& tag : entry.tags) {
+        stream << tag;
+
+        if (tag != last) {
+            stream << ",";
+        }
+    }
+
+    stream << "\"";
+
+    return stream;
+}
