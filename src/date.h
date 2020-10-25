@@ -1,4 +1,5 @@
 #include <time.h>
+#include <iostream>
 
 #pragma once
 
@@ -16,6 +17,11 @@ class date {
         int month() const;
         /** Gets this date's year. */
         int year() const;
+
+        /** Returns true if this date corresponds to the current local system date. */
+        bool today() const;
+        /** Returns true if this date corresponds to yesterday, according to the current local system date. */
+        bool yesterday() const;
 
         /** Checks if the given date is the day before this one. */
         bool is_yesterday(const date& yesterday) const;
@@ -37,6 +43,11 @@ class date {
         bool operator>=(const date& other) const;
         bool operator==(const date& other) const;
         bool operator!=(const date& other) const;
+
+        friend std::ostream& operator<<(std::ostream& stream, const date& date);
+
+        /** Returns a new date that corresponds to January 1, 1970. */
+        static date zero();
 
     private:
         date(const time_t& time, const tm* tm_obj);

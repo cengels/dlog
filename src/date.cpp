@@ -1,4 +1,7 @@
 #include <ctime>
+#include <iomanip>
+#include "rang.hpp"
+#include "config.h"
 #include "date.h"
 
 date::date() : date::date(std::time(nullptr))
@@ -34,6 +37,16 @@ int date::month() const
 int date::year() const
 {
     return this->m_year;
+}
+
+bool date::today() const
+{
+    return this->operator==(date());
+}
+
+bool date::yesterday() const
+{
+    return date().is_yesterday(*this);
 }
 
 bool date::is_yesterday(const date& yesterday) const
@@ -120,4 +133,35 @@ bool date::operator==(const date& other) const
 bool date::operator!=(const date& other) const
 {
     return !this->operator==(other);
+}
+
+std::ostream& operator<<(std::ostream& stream, const date& date)
+{
+    std::string format = config::config().long_date_format;
+    auto day_token_position = format.find("%-d");
+
+    while (day_token_position != std::string::npos) {
+        format.replace(day_token_position, 3, std::to_string(date.m_day));
+
+        day_token_position = format.find("%-d");
+    }
+
+    tm tm_obj;
+    stream << rang::fg::green;
+    stream << std::put_time(localtime_r(&date.m_time, &tm_obj), format.c_str());
+
+    if (date.today()) {
+        stream << " (today)";
+    } else if (date.yesterday()) {
+        stream << " (yesterday)";
+    }
+
+    stream << rang::fg::reset;
+
+    return stream;
+}
+
+date date::zero()
+{
+    return date(0);
 }
