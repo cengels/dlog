@@ -1,5 +1,5 @@
-#include "rang.hpp"
 #include "version.h"
+#include "../cli/color.h"
 #include "../entries.h"
 #include "../format.h"
 #include "subcommands.h"
@@ -33,9 +33,9 @@ static entries::entry parse_entry(const cxxopts::PositionalList& positionals)
 
     for (const auto& positional : positionals) {
         if (!is_valid(positional)) {
-            std::cout << "Invalid input: \"";
-            format::colorize::activity(std::cout, positional);
-            std::cout << "\"\nCommas and quotes are not allowed." << std::endl;
+            std::cout << "Invalid input: \""
+                      << cli::color::activity << positional << cli::color::reset
+                      << "\"\nCommas and quotes are not allowed." << std::endl;
 
             return entries::entry();
         }
@@ -78,9 +78,9 @@ int subcommands::fill::run(const cxxopts::ParseResult& parsedOptions)
     const auto& positionals = parsedOptions.unmatched();
 
     if (positionals.empty()) {
-        std::cout << "No activity specified. Use ";
-        format::colorize::command(std::cout, "dlog fill -h");
-        std::cout << " for usage syntax." << std::endl;
+        std::cout << "No activity specified. Use "
+                  << cli::color::command << "dlog fill -h" << cli::color::reset
+                  << " for usage syntax." << std::endl;
         return 1;
     }
 
@@ -90,11 +90,11 @@ int subcommands::fill::run(const cxxopts::ParseResult& parsedOptions)
 
     if (!last.valid()) {
         std::cout << "No entries found. There must be at least one entry before\n"
-                     "you can call ";
-        format::colorize::command(std::cout, "dlog fill");
-        std::cout << ". Call ";
-        format::colorize::command(std::cout, "dlog start");
-        std::cout << " to create one." << std::endl;
+                     "you can call "
+                  << cli::color::command << "dlog fill" << cli::color::reset
+                  << ". Call "
+                  << cli::color::command << "dlog start" << cli::color::reset
+                  << " to create one." << std::endl;
 
         return 2;
     }

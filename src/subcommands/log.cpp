@@ -1,7 +1,6 @@
 #include <experimental/filesystem>
 #include <ostream>
 #include <fstream>
-#include "rang.hpp"
 #include "version.h"
 #include "../entries.h"
 #include "../format.h"

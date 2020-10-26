@@ -1,48 +1,13 @@
 #include <iomanip>
 #include "config.h"
-#include "rang.hpp"
 #include "format.h"
+#include "cli/color.h"
 #include "date.h"
 
 namespace {
     constexpr int TIME_CHAR_COUNT = 2;
     constexpr int DURATION_LENGTH = 12;
     constexpr int ACTIVITY_PROJECT_LENGTH = 36;
-}
-
-std::ostream& format::colorize::error(std::ostream& stream, const std::string& string)
-{
-    return stream << rang::fg::red << string << rang::fg::reset;
-}
-
-std::ostream& format::colorize::project(std::ostream& stream, const std::string& string)
-{
-    return stream << rang::fgB::red << string << rang::fg::reset;
-}
-
-std::ostream& format::colorize::activity(std::ostream& stream, const std::string& string)
-{
-    return stream << rang::fg::cyan << string << rang::fg::reset;
-}
-
-std::ostream& format::colorize::time(std::ostream& stream, const std::string& string)
-{
-    return stream << rang::fg::magenta << string << rang::fg::reset;
-}
-
-std::ostream& format::colorize::duration(std::ostream& stream, const std::string& string)
-{
-    return stream << rang::fgB::magenta << string << rang::fg::reset;
-}
-
-std::ostream& format::colorize::tag(std::ostream& stream, const std::string& string)
-{
-    return stream << rang::fgB::yellow << string << rang::fg::reset;
-}
-
-std::ostream& format::colorize::command(std::ostream& stream, const std::string& string)
-{
-    return stream << rang::fg::blue << string << rang::fg::reset;
 }
 
 std::string format::as_local_time_string(const time_t& time)
@@ -123,43 +88,30 @@ std::string format::as_duration(const time_t& duration, const bool& always_pad)
 
 std::ostream& format::entry(std::ostream& stream, const entries::entry& entry)
 {
-    stream << "activity ";
-    format::colorize::activity(stream, entry.activity);
+    stream << "activity " << cli::color::activity << entry.activity << cli::color::reset;
 
     if (!entry.project.empty()) {
-        stream << " on project ";
-        format::colorize::project(stream, entry.project);
+        stream << " on project " << cli::color::project << entry.project << cli::color::reset;
     }
 
     if (!entry.tags.empty()) {
-        stream << " ";
-
-        std::string tag_string = "[";
+        stream << " [";
 
         for (const std::string& tag : entry.tags) {
             if (tag != *entry.tags.begin()) {
-                tag_string.append(", ");
+                stream << ", ";
             }
 
-            tag_string.append(tag);
+            stream << cli::color::tag << tag << cli::color::reset;
         }
 
-        tag_string.append("]");
-
-        format::colorize::tag(stream, tag_string);
+        stream << ']';
     }
 
-    stream << " from ";
-    format::colorize::time(stream, format::as_local_time_string(entry.from));
+    stream << " from " << cli::color::time << format::as_local_time_string(entry.from) << cli::color::reset;
+    stream << " to " << cli::color::time << format::as_local_time_string(entry.to) << cli::color::reset;
 
-    stream << " to ";
-    format::colorize::time(stream, format::as_local_time_string(entry.to));
-
-    stream << " ";
-    std::string duration = "(";
-    duration.append(format::as_duration(entry.to - entry.from));
-    duration.append(")");
-    format::colorize::duration(stream, duration);
+    stream << " " << cli::color::duration << '(' << format::as_duration(entry.to - entry.from) << ')' << cli::color::reset;
 
     return stream;
 }
@@ -167,11 +119,11 @@ std::ostream& format::entry(std::ostream& stream, const entries::entry& entry)
 static std::ostream& write_entries(std::ostream& stream, std::vector<entries::entry>::const_reverse_iterator begin, const std::vector<entries::entry>::const_reverse_iterator& end)
 {
     for (; begin < end; begin++) {
-        stream << "    " << rang::fg::magenta;
+        stream << "    " << cli::color::time;
         format::local_time(stream, begin->from);
-        stream << rang::fg::reset << " to " << rang::fg::magenta;
+        stream << cli::color::reset << " to " << cli::color::time;
         format::local_time(stream, begin->to);
-        stream << ' ';
+        stream << cli::color::reset << ' ';
 
         // durations can have varying lengths
         std::string duration = "(";
@@ -184,22 +136,22 @@ static std::ostream& write_entries(std::ostream& stream, std::vector<entries::en
             went_over_by = 0;
         }
 
-        stream << rang::fgB::magenta << std::setw(DURATION_LENGTH) << duration << "  ";
+        stream << cli::color::duration << std::setw(DURATION_LENGTH) << duration << cli::color::reset << "  ";
 
         if (begin->project.empty()) {
-            stream << rang::fg::cyan << std::setw(ACTIVITY_PROJECT_LENGTH - went_over_by) << begin->activity << rang::fg::reset;
+            stream << cli::color::activity << std::setw(ACTIVITY_PROJECT_LENGTH - went_over_by) << begin->activity << cli::color::reset;
         } else {
             const int length = ACTIVITY_PROJECT_LENGTH - went_over_by - begin->project.length() - 1;
-            stream << rang::fg::cyan << std::setw(length) << begin->activity << rang::fg::reset;
+            stream << cli::color::activity << std::setw(length) << begin->activity << cli::color::reset;
             stream << ':';
-            stream << rang::fgB::red << begin->project << rang::fg::reset;
+            stream << cli::color::project << begin->project << cli::color::reset;
         }
 
         if (!begin->tags.empty()) {
             stream << "  [";
 
             for (const auto& tag : begin->tags) {
-                stream << rang::fgB::yellow << tag << rang::fg::reset;
+                stream << cli::color::tag << tag << cli::color::reset;
 
                 if (&tag != &begin->tags.back()) {
                     stream << ", ";

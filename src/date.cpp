@@ -1,6 +1,6 @@
 #include <ctime>
 #include <iomanip>
-#include "rang.hpp"
+#include "cli/color.h"
 #include "config.h"
 #include "date.h"
 
@@ -147,7 +147,7 @@ std::ostream& operator<<(std::ostream& stream, const date& date)
     }
 
     tm tm_obj;
-    stream << rang::fg::green;
+    stream << cli::color::date;
     stream << std::put_time(localtime_r(&date.m_time, &tm_obj), format.c_str());
 
     if (date.today()) {
@@ -156,7 +156,7 @@ std::ostream& operator<<(std::ostream& stream, const date& date)
         stream << " (yesterday)";
     }
 
-    stream << rang::fg::reset;
+    stream << cli::color::reset;
 
     return stream;
 }

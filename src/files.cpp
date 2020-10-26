@@ -1,6 +1,6 @@
 #include <iostream>
 #include "files.h"
-#include "rang.hpp"
+#include "cli/color.h"
 
 namespace fs = std::experimental::filesystem;
 
@@ -15,8 +15,8 @@ static const const fs::path default_path()
     const char* app_data_env_variable = getenv("AppData");
 
     if (app_data_env_variable == nullptr) {
-        std::cerr << rang::fg::red << "Error: " << rang::fgB::red << "Could not locate AppData directory. This is likely not your fault.\n"
-                     "To fix this problem, try defining your own config path as the environment variable DLOG_PATH." << rang::fg::reset << std::endl;
+        std::cerr << cli::color::error << "Error: " << cli::color::error_message << "Could not locate AppData directory. This is likely not your fault.\n"
+                     "To fix this problem, try defining your own config path as the environment variable DLOG_PATH." << cli::color::reset << std::endl;
         return fs::path();
     }
 
@@ -26,8 +26,8 @@ static const const fs::path default_path()
 
     std::error_code error;
     if (!fs::create_directory(app_data_path, error) && error) {
-        std::cerr << rang::fg::red << "Error: " << rang::fgB::red << "Could not create config directory.\n"
-                     "File system reported: " << error.message() << " (" << error.value() << ")" << rang::fg::reset << std::endl;
+        std::cerr << cli::color::error << "Error: " << cli::color::error_message << "Could not create config directory.\n"
+                     "File system reported: " << error.message() << " (" << error.value() << ")" << cli::color::reset << std::endl;
         return fs::path();
     }
 
@@ -45,8 +45,8 @@ static const fs::path default_path()
         home_env_variable = getenv("HOME");
 
         if (home_env_variable == nullptr) {
-            std::cerr << rang::fg::red << "Error: " << rang::fgB::red << "Could not locate HOME directory. This is likely not your fault.\n"
-                         "To fix this problem, try defining your own config path as the environment variable DLOG_PATH." << rang::fg::reset << std::endl;
+            std::cerr << cli::color::error << "Error: " << cli::color::error_message << "Could not locate HOME directory. This is likely not your fault.\n"
+                         "To fix this problem, try defining your own config path as the environment variable DLOG_PATH." << cli::color::reset << std::endl;
         return fs::path();
         }
 
@@ -57,8 +57,8 @@ static const fs::path default_path()
 
     std::error_code error;
     if (!fs::create_directories(config_path, error) && error) {
-        std::cerr << rang::fg::red << "Error: " << rang::fgB::red << "Could not create config directory.\n"
-                     "File system reported: " << error.message() << " (" << error.value() << ")" << rang::fg::reset << std::endl;
+        std::cerr << cli::color::error << "Error: " << cli::color::error_message << "Could not create config directory.\n"
+                     "File system reported: " << error.message() << " (" << error.value() << ")" << cli::color::reset << std::endl;
         return fs::path();
     }
 
@@ -77,8 +77,8 @@ const fs::path& files::dlog_dir()
             if (fs::exists(custom_path)) {
                 m_dlog_dir = fs::path(path);
             } else {
-                std::cerr << rang::fg::red << "Error: " << rang::fgB::red << "Invalid DLOG_PATH [" << path << "].\n"
-                             "Check your DLOG_PATH environment variable and make sure it's a valid directory." << rang::fg::reset << std::endl;
+                std::cerr << cli::color::error << "Error: " << cli::color::error_message << "Invalid DLOG_PATH [" << path << "].\n"
+                             "Check your DLOG_PATH environment variable and make sure it's a valid directory." << cli::color::reset << std::endl;
                 m_dlog_dir = fs::path();
             }
         } else {
