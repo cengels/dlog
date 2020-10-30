@@ -1,3 +1,4 @@
+#include <ctime>
 #include "entry.h"
 
 entries::entry::entry() : from(0), to(0)
@@ -5,8 +6,12 @@ entries::entry::entry() : from(0), to(0)
 
 bool entries::entry::valid() const
 {
-    return this->from > 0
-        && (this->to == 0 || this->to >= this->from);
+    time_t now = std::time(nullptr);
+
+    return this->from > 0  // from must not be uninitialized
+        && (this->to == 0 || this->to >= this->from)  // to must be uninitialized or greater than from
+        && this->from <= now  // from must be smaller than now
+        && this->to <= now;  // to must be smaller than now
 }
 
 bool entries::entry::complete() const
