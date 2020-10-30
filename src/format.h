@@ -17,6 +17,11 @@ namespace format {
     std::ostream& local_time(std::ostream& stream, const time_t& time);
 
     /**
+     * Returns a local date string as a string.
+     */
+    std::string date_string(const time_t& time);
+
+    /**
      * Formats a POSIX time duration as a local duration string.
      */
     std::string as_duration(const time_t& duration, const bool& always_pad = false);

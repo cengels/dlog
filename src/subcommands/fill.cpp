@@ -2,6 +2,7 @@
 #include "../cli/color.h"
 #include "../entries.h"
 #include "../format.h"
+#include "../parser.h"
 #include "subcommands.h"
 #include "fill.h"
 
@@ -10,7 +11,10 @@ cxxopts::Options subcommands::fill::options() const
     auto opts = subcommands::subcommand::options();
 
     opts.add_options()
-        ("h,help", "Prints all available options.");
+        ("h,help", "Prints all available options.")
+        ("f,from", "A date-time, time, or temporal expression when the entry started.", cxxopts::value<std::string>())
+        ("t,to", "A date-time, time, or temporal expression when the entry stopped.", cxxopts::value<std::string>())
+        ("d,duration", "A duration to say how long the entry lasted from start.", cxxopts::value<std::string>());
 
     opts.allow_unrecognised_options();
 
@@ -103,8 +107,62 @@ int subcommands::fill::run(const cxxopts::ParseResult& parsedOptions)
         // append new entry
         entry.from = last.to;
     } else {
+        if (parsedOptions.count("from") > 0) {
+            std::cout << "Can't use \"from\" when the last entry is incomplete." << std::endl;
+
+            return 1;
+        }
+
         // overwrite last entry
         entry.from = last.from;
+    }
+
+    if (parsedOptions.count("from") > 0) {
+        int from = parser::parse_temporal(parsedOptions["from"].as<std::string>());
+
+        if (from == 0) {
+            std::cout << "Invalid format in \"from\". Use -h for help." << std::endl;
+
+            return 1;
+        }
+
+        format::local_time(std::cout, from);
+        std::cout << std::endl;
+
+        entry.from = from;
+    }
+
+    if (parsedOptions.count("to") > 0) {
+        int to = parser::parse_temporal(parsedOptions["to"].as<std::string>());
+
+        if (to == 0) {
+            std::cout << "Invalid format in \"to\". Invalid format. Use -h for help." << std::endl;
+
+            return 1;
+        }
+
+        format::local_time(std::cout, to);
+        std::cout << std::endl;
+
+        entry.to = to;
+
+        if (parsedOptions.count("duration") > 0) {
+            std::cout << "Invalid format in \"duration\". Cannot specify both \"to\" and \"duration\"." << std::endl;
+
+            return 1;
+        }
+    }
+
+    if (parsedOptions.count("duration") > 0) {
+        int duration = parser::parse_relative_time(parsedOptions["duration"].as<std::string>());
+
+        if (duration == 0) {
+            std::cout << "Invalid option: \"duration\". Invalid format. Use -h for help." << std::endl;
+
+            return 1;
+        }
+
+        entry.to = entry.from + duration;
     }
 
     if (!entry.valid()) {

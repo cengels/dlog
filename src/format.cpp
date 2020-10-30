@@ -24,17 +24,22 @@ std::string format::as_local_time_string(const time_t& time)
     if (now_date.is_yesterday(time_date)) {
         result.append("yesterday at ");
     } else if (now_date != time_date) {
-        char date_string[30];
-
-        strftime(date_string, sizeof(date_string), config::config().date_format.c_str(), localtime(&time));
-
-        result.append(date_string);
+        result.append(format::date_string(time));
         result.append(" ");
     }
 
     result.append(time_string);
 
     return result;
+}
+
+std::string format::date_string(const time_t& time)
+{
+    char date_string[50];
+
+    strftime(date_string, sizeof(date_string), config::config().date_format.c_str(), localtime(&time));
+
+    return std::string(date_string);
 }
 
 std::ostream& format::local_time(std::ostream& stream, const time_t& time)

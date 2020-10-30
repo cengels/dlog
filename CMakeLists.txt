@@ -11,6 +11,7 @@ add_executable(dlog "src/main.cpp"
     "src/date.h" "src/date.cpp"
     "src/format.h" "src/format.cpp"
     "src/config.h" "src/config.cpp"
+    "src/parser.h" "src/parser.cpp"
     "src/cli/color.h" "src/cli/color.cpp"
     "src/subcommands/subcommands.h" "src/subcommands/subcommands.cpp"
     "src/subcommands/subcommand.h" "src/subcommands/subcommand.cpp"
@@ -21,9 +22,9 @@ add_executable(dlog "src/main.cpp"
 )
 configure_file(version.h.in version.h)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(ENV{CMAKE_EXPORT_COMPILE_COMMANDS} TRUE)
-set(CLANG_TIDY_CHECKS *,-llvm-include-order,-fuchsia-default-arguments,-clang-diagnostic-error,-misc-unused-parameters,-llvm-namespace-comment,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-google-runtime-references,-cppcoreguidelines-owning-memory,-fuchsia-overloaded-operator,-hicpp-signed-bitwise)
+set(CLANG_TIDY_CHECKS *,-llvm-include-order,-fuchsia-default-arguments,-clang-diagnostic-error,-misc-unused-parameters,-llvm-namespace-comment,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-google-runtime-references,-cppcoreguidelines-owning-memory,-fuchsia-overloaded-operator,-hicpp-signed-bitwise,-modernize-raw-string-literal)
 option(USE_LINTERS "Should compilation use linters?" ON)
 target_compile_features(dlog PUBLIC cxx_std_17)
 target_link_libraries(dlog -lstdc++fs)
