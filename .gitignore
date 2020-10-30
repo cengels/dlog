@@ -9,5 +9,6 @@ CMakeFiles/
 *.cmake
 CMakeCache.txt
 Makefile
+compile_commands.json
 
 version.h
