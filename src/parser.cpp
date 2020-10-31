@@ -28,9 +28,9 @@ time_t parser::parse_relative_time(const std::string& string)
         } else if (is_plural ? temporal_type == "weeks" : temporal_type == "week") {
             return temporal_count * 604800;
         }
-
-        return 0;
     }
+
+    return 0;
 }
 
 time_t parser::parse_temporal(const std::string& string)
