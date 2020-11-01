@@ -215,12 +215,6 @@ int subcommands::fill::run(const cxxopts::ParseResult& parsedOptions)
         // append new entry
         entry.from = last.to;
     } else {
-        if (parsedOptions.count("from") > 0) {
-            std::cout << "Can't use \"from\" when the last entry is incomplete." << std::endl;
-
-            return 1;
-        }
-
         // overwrite last entry
         entry.from = last.from;
     }
