@@ -42,7 +42,9 @@ std::ostream& entries::operator<<(std::ostream& stream, const entries::entry& en
         }
     }
 
-    stream << "\"";
+    stream << "\",\""
+           << entry.comment
+           << "\"";
 
     return stream;
 }

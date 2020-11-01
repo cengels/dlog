@@ -30,6 +30,10 @@ namespace entries {
          * A variable number of tags that belong to this time entry.
          */
         std::vector<std::string> tags;
+        /**
+         * An optional entry comment.
+         */
+        std::string comment;
 
         /** Returns true if this time entry is valid. */
         bool valid() const;

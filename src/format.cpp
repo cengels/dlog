@@ -121,7 +121,7 @@ std::ostream& format::entry(std::ostream& stream, const entries::entry& entry)
     return stream;
 }
 
-static std::ostream& write_entries(std::ostream& stream, std::vector<entries::entry>::const_reverse_iterator begin, const std::vector<entries::entry>::const_reverse_iterator& end)
+static std::ostream& write_entries(std::ostream& stream, std::vector<entries::entry>::const_reverse_iterator begin, const std::vector<entries::entry>::const_reverse_iterator& end, const bool& show_comments)
 {
     for (; begin < end; begin++) {
         stream << "    " << cli::color::time;
@@ -167,12 +167,16 @@ static std::ostream& write_entries(std::ostream& stream, std::vector<entries::en
         }
 
         stream << "\n";
+
+        if (show_comments && !begin->comment.empty()) {
+            stream << "      " << cli::color::comment << begin->comment << cli::color::reset << "\n";
+        }
     }
 
     return stream;
 }
 
-std::ostream& format::entries(std::ostream& stream, std::vector<entries::entry>::const_iterator begin, const std::vector<entries::entry>::const_iterator& end)
+std::ostream& format::entries(std::ostream& stream, std::vector<entries::entry>::const_iterator begin, const std::vector<entries::entry>::const_iterator& end, const bool& show_comments)
 {
     // rang automatically ignores color codes
     // if the output stream is a file, so we
@@ -193,7 +197,7 @@ std::ostream& format::entries(std::ostream& stream, std::vector<entries::entry>:
         const date entry_date = date(entry.from);
 
         if (current_date != entry_date) {
-            write_entries(stream, date_entries.rbegin(), date_entries.rend());
+            write_entries(stream, date_entries.rbegin(), date_entries.rend(), show_comments);
 
             if (!date_entries.empty()) {
                 stream << "\n";
@@ -208,7 +212,7 @@ std::ostream& format::entries(std::ostream& stream, std::vector<entries::entry>:
         date_entries.push_back(entry);
     }
 
-    write_entries(stream, date_entries.rbegin(), date_entries.rend());
+    write_entries(stream, date_entries.rbegin(), date_entries.rend(), show_comments);
 
     rang::setControlMode(rang::control::Auto);
 

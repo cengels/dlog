@@ -13,7 +13,7 @@ fi
 # so we use jq to parse each array, turn the tags into a string
 # and then convert each array into a CSV line.
 
-jq -r 'map([.[0], .[1], .[2], "", (.[4] | join(","))] | @csv) | join("\n")' "$1" > "$2"
+jq -r 'map([.[0], .[1], .[2], "", (.[4] | join(",")), ""] | @csv) | join("\n")' "$1" > "$2"
 
 count=`jq length "$1"`
 

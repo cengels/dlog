@@ -45,6 +45,13 @@ static entries::entry parse(const std::string& line)
     position_end = line.find('"', position_start);
     std::string tags = line.substr(position_start, position_end - position_start);
 
+    position_start = position_end + 3;
+    position_end = line.find('"', position_start);
+
+    if (position_end != std::string::npos) {
+        entry.comment = line.substr(position_start, position_end - position_start);
+    }
+
     position_start = 0;
     position_end = tags.find(',');
     const int length = tags.length();

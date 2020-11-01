@@ -15,9 +15,8 @@ cxxopts::Options subcommands::log::options() const
     opts.add_options()
         ("h,help", "Prints all available options.")
         ("P,no-pager", "Forces the log to print to standard output.")
+        ("c,comments", "Prints the entries' comments as well.")
         ("l,limit", "Limits the output to the last n entries.", cxxopts::value<int>());
-
-    opts.allow_unrecognised_options();
 
     return opts;
 }
@@ -36,6 +35,7 @@ int subcommands::log::run(const cxxopts::ParseResult& parsedOptions)
     }
 
     const auto& entries = entries::read_all(limit);
+    const bool show_comments = parsedOptions.count("comments") > 0;
 
     if (parsedOptions.count("no-pager") == 0) {
         auto path = std::experimental::filesystem::temp_directory_path();
@@ -43,7 +43,7 @@ int subcommands::log::run(const cxxopts::ParseResult& parsedOptions)
         if (!path.empty()) {
             path.append("dlog_log_output");
             std::ofstream stream(path.c_str(), std::ios_base::trunc);
-            format::entries(stream, entries.begin(), entries.end());
+            format::entries(stream, entries.begin(), entries.end(), show_comments);
             stream.close();
 
             files::open_in_pager(path);
@@ -53,7 +53,7 @@ int subcommands::log::run(const cxxopts::ParseResult& parsedOptions)
         }
     }
 
-    format::entries(std::cout, entries.begin(), entries.end());
+    format::entries(std::cout, entries.begin(), entries.end(), show_comments);
 
     return 0;
 }

@@ -12,6 +12,7 @@ namespace cli {
         duration = static_cast<int>(rang::fgB::magenta),
         date = static_cast<int>(rang::fg::green),
         tag = static_cast<int>(rang::fgB::yellow),
+        comment = static_cast<int>(rang::fgB::cyan),
         command = static_cast<int>(rang::fg::blue),
         reset = static_cast<int>(rang::fg::reset)
     };

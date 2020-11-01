@@ -15,6 +15,7 @@ cxxopts::Options subcommands::fill::options() const
         ("f,from", "A date-time, time, or temporal expression when the entry started.", cxxopts::value<std::string>())
         ("t,to", "A date-time, time, or temporal expression when the entry stopped.", cxxopts::value<std::string>())
         ("d,duration", "A duration to say how long the entry lasted from start.", cxxopts::value<std::string>())
+        ("c,comment", "A comment to be added to the entry.", cxxopts::value<std::string>())
         ("u,update", "Updates the last entry instead of adding a new one.");
 
     opts.allow_unrecognised_options();
@@ -197,6 +198,10 @@ int subcommands::fill::run(const cxxopts::ParseResult& parsedOptions)
     }
 
     entries::entry entry = parse_entry(positionals);
+
+    if (parsedOptions.count("comment") > 0) {
+        entry.comment = parsedOptions["comment"].as<std::string>();
+    }
 
     const entries::entry& last = entries::last();
 
