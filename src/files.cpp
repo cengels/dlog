@@ -303,7 +303,6 @@ bool files::open_in_pager(const std::experimental::filesystem::path& path)
     command.append(path.c_str());
 
     if (system(command.c_str()) == 0) {
-        std::cout << command << std::endl;
         return true;
     }
 

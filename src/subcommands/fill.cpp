@@ -14,7 +14,8 @@ cxxopts::Options subcommands::fill::options() const
         ("h,help", "Prints all available options.")
         ("f,from", "A date-time, time, or temporal expression when the entry started.", cxxopts::value<std::string>())
         ("t,to", "A date-time, time, or temporal expression when the entry stopped.", cxxopts::value<std::string>())
-        ("d,duration", "A duration to say how long the entry lasted from start.", cxxopts::value<std::string>());
+        ("d,duration", "A duration to say how long the entry lasted from start.", cxxopts::value<std::string>())
+        ("u,update", "Updates the last entry instead of adding a new one.");
 
     opts.allow_unrecognised_options();
 
@@ -73,6 +74,109 @@ static entries::entry parse_entry(const cxxopts::PositionalList& positionals)
     return entry;
 }
 
+static bool parse_from(const cxxopts::ParseResult& parsedOptions, entries::entry& entry)
+{
+    if (parsedOptions.count("from") > 0) {
+        int from = parser::parse_temporal(parsedOptions["from"].as<std::string>());
+
+        if (from == 0) {
+            std::cout << "Invalid format in \"from\". Use -h for help." << std::endl;
+
+            return false;
+        }
+
+        entry.from = from;
+    }
+
+    return true;
+}
+
+static bool parse_to(const cxxopts::ParseResult& parsedOptions, entries::entry& entry)
+{
+    if (parsedOptions.count("to") > 0) {
+        int to = parser::parse_temporal(parsedOptions["to"].as<std::string>());
+
+        if (to == 0) {
+            std::cout << "Invalid format in \"to\". Invalid format. Use -h for help." << std::endl;
+
+            return false;
+        }
+
+        entry.to = to;
+
+        if (parsedOptions.count("duration") > 0) {
+            std::cout << "Invalid format in \"duration\". Cannot specify both \"to\" and \"duration\"." << std::endl;
+
+            return false;
+        }
+    }
+
+    return true;
+}
+
+static bool parse_duration(const cxxopts::ParseResult& parsedOptions, entries::entry& entry)
+{
+    if (parsedOptions.count("duration") > 0) {
+        int duration = parser::parse_relative_time(parsedOptions["duration"].as<std::string>());
+
+        if (duration == 0) {
+            std::cout << "Invalid option: \"duration\". Invalid format. Use -h for help." << std::endl;
+
+            return false;
+        }
+
+        entry.to = entry.from + duration;
+    }
+
+    return true;
+}
+
+static int run_update(const cxxopts::ParseResult& parsedOptions)
+{
+    const auto& positionals = parsedOptions.unmatched();
+
+    if (!positionals.empty()
+        || parsedOptions.count("from") > 0) {
+        std::cout << "When using -u, only -d and -t are valid." << std::endl;
+
+        return 1;
+    }
+
+    entries::entry last = entries::last();
+
+    if (!last.complete()) {
+        std::cout << "The last entry must be a completed entry, meaning you have to use "
+                  << cli::color::command << "dlog fill" << cli::color::reset
+                  << " without the -u option at least once." << std::endl;
+
+        return 1;
+    }
+
+    last.to = std::time(nullptr);
+
+    if (!parse_to(parsedOptions, last)) {
+        return 1;
+    }
+
+    if (!parse_duration(parsedOptions, last)) {
+        return 1;
+    }
+
+    if (!last.valid()) {
+        std::cout << "A time entry cannot be in the future." << std::endl;
+
+        return 1;
+    }
+
+    entries::overwrite_last(last);
+
+    std::cout << "Updated ";
+    format::entry(std::cout, last);
+    std::cout << "." << std::endl;
+
+    return 0;
+}
+
 int subcommands::fill::run(const cxxopts::ParseResult& parsedOptions)
 {
     if (parsedOptions.count("help") != 0) {
@@ -80,6 +184,10 @@ int subcommands::fill::run(const cxxopts::ParseResult& parsedOptions)
     }
 
     const auto& positionals = parsedOptions.unmatched();
+
+    if (parsedOptions.count("update") > 0) {
+        return run_update(parsedOptions);
+    }
 
     if (positionals.empty()) {
         std::cout << "No activity specified. Use "
@@ -100,7 +208,7 @@ int subcommands::fill::run(const cxxopts::ParseResult& parsedOptions)
                   << cli::color::command << "dlog start" << cli::color::reset
                   << " to create one." << std::endl;
 
-        return 2;
+        return 1;
     }
 
     if (last.complete()) {
@@ -117,52 +225,16 @@ int subcommands::fill::run(const cxxopts::ParseResult& parsedOptions)
         entry.from = last.from;
     }
 
-    if (parsedOptions.count("from") > 0) {
-        int from = parser::parse_temporal(parsedOptions["from"].as<std::string>());
-
-        if (from == 0) {
-            std::cout << "Invalid format in \"from\". Use -h for help." << std::endl;
-
-            return 1;
-        }
-
-        format::local_time(std::cout, from);
-        std::cout << std::endl;
-
-        entry.from = from;
+    if (!parse_from(parsedOptions, entry)) {
+        return 1;
     }
 
-    if (parsedOptions.count("to") > 0) {
-        int to = parser::parse_temporal(parsedOptions["to"].as<std::string>());
-
-        if (to == 0) {
-            std::cout << "Invalid format in \"to\". Invalid format. Use -h for help." << std::endl;
-
-            return 1;
-        }
-
-        format::local_time(std::cout, to);
-        std::cout << std::endl;
-
-        entry.to = to;
-
-        if (parsedOptions.count("duration") > 0) {
-            std::cout << "Invalid format in \"duration\". Cannot specify both \"to\" and \"duration\"." << std::endl;
-
-            return 1;
-        }
+    if (!parse_to(parsedOptions, entry)) {
+        return 1;
     }
 
-    if (parsedOptions.count("duration") > 0) {
-        int duration = parser::parse_relative_time(parsedOptions["duration"].as<std::string>());
-
-        if (duration == 0) {
-            std::cout << "Invalid option: \"duration\". Invalid format. Use -h for help." << std::endl;
-
-            return 1;
-        }
-
-        entry.to = entry.from + duration;
+    if (!parse_duration(parsedOptions, entry)) {
+        return 1;
     }
 
     if (!entry.valid()) {
