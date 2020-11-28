@@ -1,3 +1,4 @@
+#include <set>
 #include "version.h"
 #include "../cli/color.h"
 #include "../entries.h"
@@ -35,7 +36,8 @@ static entries::entry parse_entry(const cxxopts::PositionalList& positionals)
     entry.to = std::time(nullptr);
 
     std::string activity;
-    std::vector<std::string> tags;
+    std::set<std::string> tags;
+    std::string tag;
 
     for (const auto& positional : positionals) {
         if (!is_valid(positional)) {
@@ -47,18 +49,26 @@ static entries::entry parse_entry(const cxxopts::PositionalList& positionals)
         }
 
         if (positional.at(0) == '+') {
-            tags.push_back(positional.substr(1));
-        } else if (tags.empty()) {
+            if (!tag.empty()) {
+                tags.insert(tag);
+                tag.clear();
+            }
+
+            tag = positional.substr(1);
+        } else if (!tags.empty() || !tag.empty()) {
+            tag.append(" ");
+            tag.append(positional);
+        } else {
             if (!activity.empty()) {
                 activity.append(" ");
             }
 
             activity.append(positional);
-        } else {
-            std::string& last = *(tags.end() - 1);
-            last.append(" ");
-            last.append(positional);
         }
+    }
+
+    if (!tag.empty()) {
+        tags.insert(tag);
     }
 
     const int colon_position = activity.find(':', 1);
@@ -70,7 +80,7 @@ static entries::entry parse_entry(const cxxopts::PositionalList& positionals)
         entry.project = activity.substr(colon_position + 1);
     }
 
-    entry.tags = tags;
+    entry.tags = std::vector<std::string>(tags.begin(), tags.end());
 
     return entry;
 }
