@@ -1,6 +1,7 @@
 #include <experimental/filesystem>
 #include <fstream>
 #include <iostream>
+#include <algorithm>
 #include "files.h"
 #include "entries.h"
 
@@ -177,7 +178,7 @@ bool entries::overwrite_last(const entries::entry& entry)
 
 std::vector<entries::entry> entries::read_all(uint limit)
 {
-    std::vector<entries::entry> entries;
+    std::vector<entries::entry> entries(limit == 0 ? 3000 : limit);
     const fs::path& file_path = entries_file_path();
 
     if (file_path.empty()) {
@@ -186,22 +187,38 @@ std::vector<entries::entry> entries::read_all(uint limit)
 
     std::ifstream entries_file(file_path.c_str());
     std::string line;
-    uint i = 0;
-    files::get_last_line(entries_file, line);
 
-    do {
-        if (line.empty()) {
-            continue;
+    // If we have to read all lines, we read them front-to-back
+    // because files::get_previous_line() is actually very
+    // slow due to heavy use of peek() and seekg().
+
+    if (limit == 0) {
+        while (std::getline(entries_file, line)) {
+            entries::entry entry = parse(line);
+
+            if (entry.valid()) {
+                entries.push_back(entry);
+            }
         }
 
-        entries::entry entry = parse(line);
+        std::reverse(entries.begin(), entries.end());
+    } else {
+        uint i = 0;
+        files::get_last_line(entries_file, line);
+        do {
+            if (line.empty()) {
+                continue;
+            }
 
-        if (entry.valid()) {
-            entries.push_back(entry);
-        }
+            entries::entry entry = parse(line);
 
-        i++;
-    } while (files::get_previous_line(entries_file, line) && (limit == 0 || i < limit));
+            if (entry.valid()) {
+                entries.push_back(entry);
+            }
+
+            i++;
+        } while (files::get_previous_line(entries_file, line) && (i < limit));
+    }
 
     entries_file.close();
 
