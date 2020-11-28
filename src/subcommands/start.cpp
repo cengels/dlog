@@ -36,7 +36,7 @@ int subcommands::start::run(const cxxopts::ParseResult& parsedOptions)
     entries::entry entry;
     entry.from = std::time(nullptr);
 
-    if (!entries::write(entry)) {
+    if (!entries::append(entry)) {
         std::cerr << cli::color::error << "Error: " << cli::color::error_message << "Couldn't write to entries file.\n"
                      "Do you have write permission?"
                   << cli::color::reset << std::endl;

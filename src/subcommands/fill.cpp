@@ -253,7 +253,7 @@ int subcommands::fill::run(const cxxopts::ParseResult& parsedOptions)
     }
 
     if (last.complete()) {
-        entries::write(entry);
+        entries::append(entry);
     } else {
         entries::overwrite(0, entry);
     }

@@ -94,7 +94,7 @@ entries::entry entries::last()
     return parse(last_line);
 }
 
-bool entries::write(const entries::entry& entry)
+bool entries::append(const entries::entry& entry)
 {
     if (!entry.valid()) {
         return false;
@@ -112,12 +112,12 @@ bool entries::write(const entries::entry& entry)
         return false;
     }
 
-    std::fstream entries_file(temp_path.c_str(), std::ios::in | std::ios::out);
-    files::append_to_last_line(entries_file);
+    std::fstream temp_file(temp_path.c_str(), std::ios::in | std::ios::out);
+    files::append_to_last_line(temp_file);
 
-    entries_file << entry << "\n";
+    temp_file << entry << "\n";
 
-    if (entries_file.fail()) {
+    if (temp_file.fail()) {
         files::restore(file_path);
         return false;
     }

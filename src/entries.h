@@ -13,6 +13,8 @@ namespace entries {
      * Appends a single entry to the back of the entries file
      * and returns a value indicating whether the operation was successful.
      */
+    bool append(const entries::entry& entry);
+
     /**
      * Overwrites the nth entry from the back of the entries file
      * and returns a value indicating whether the operation was successful.
