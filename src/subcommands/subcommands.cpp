@@ -4,6 +4,7 @@
 #include "fill.h"
 #include "log.h"
 #include "remove.h"
+#include "summary.h"
 
 namespace {
     std::vector<subcommands::subcommand*>* vector = nullptr;
@@ -17,7 +18,8 @@ std::vector<subcommands::subcommand*>& subcommands::subcommands()
             new subcommands::start(),
             new subcommands::fill(),
             new subcommands::log(),
-            new subcommands::remove()
+            new subcommands::remove(),
+            new subcommands::summary()
         };
     }
 

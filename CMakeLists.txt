@@ -20,12 +20,13 @@ add_executable(dlog "src/main.cpp"
     "src/subcommands/fill.h" "src/subcommands/fill.cpp"
     "src/subcommands/log.h" "src/subcommands/log.cpp"
     "src/subcommands/remove.h" "src/subcommands/remove.cpp"
+    "src/subcommands/summary.h" "src/subcommands/summary.cpp"
 )
 configure_file(version.h.in version.h)
 
 set(CMAKE_CXX_STANDARD 20)
 set(ENV{CMAKE_EXPORT_COMPILE_COMMANDS} TRUE)
-set(CLANG_TIDY_CHECKS *,-llvm-include-order,-fuchsia-default-arguments,-clang-diagnostic-error,-misc-unused-parameters,-llvm-namespace-comment,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-google-runtime-references,-cppcoreguidelines-owning-memory,-fuchsia-overloaded-operator,-hicpp-signed-bitwise,-modernize-raw-string-literal)
+set(CLANG_TIDY_CHECKS *,-llvm-include-order,-fuchsia-default-arguments,-clang-diagnostic-error,-misc-unused-parameters,-llvm-namespace-comment,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-google-runtime-references,-cppcoreguidelines-owning-memory,-fuchsia-overloaded-operator,-hicpp-signed-bitwise,-modernize-raw-string-literal,-google-readability-namespace-comments)
 option(USE_LINTERS "Should compilation use linters?" ON)
 target_compile_features(dlog PUBLIC cxx_std_17)
 target_link_libraries(dlog -lstdc++fs)
