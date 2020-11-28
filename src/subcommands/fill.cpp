@@ -262,8 +262,8 @@ std::string subcommands::fill::command() const
 
 std::string subcommands::fill::syntax() const
 {
-    return "[-h] <activity> [+<tag>...]\n"
-           "            [-h] <activity>:<project> [+<tag>...]";
+    return "[-h] <activity> [+<tag>...] [-m <message>] [-u] [-f <datetime>] [-t <datetime>]\n"
+           "            [-h] <activity>:<project> [+<tag>...] [-m <message>] [-u] [-f <datetime>] [-t <datetime>]";
 }
 
 std::string subcommands::fill::description() const
@@ -272,6 +272,7 @@ std::string subcommands::fill::description() const
            "  Activities, projects, and tags all allow whitespace within them, but not quotes or commas.\n\n"
            "  Examples:\n"
            "    dlog fill watch:yt +my-favorite-channel\n"
-           "    dlog fill gaming:cyberpunk 2077 +singleplayer +pc\n"
+           "    dlog fill gaming:cyberpunk 2077 +singleplayer +pc -t \"1 hour ago\"\n"
+           "    dlog fill shopping:online -m \"new headphones\"\n"
            "    dlog fill shower";
 }
