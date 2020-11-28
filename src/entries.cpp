@@ -126,9 +126,28 @@ bool entries::write(const entries::entry& entry)
     return true;
 }
 
-bool entries::overwrite_last(const entries::entry& entry)
+static bool write_all(std::ofstream& file_stream, std::vector<entries::entry>& entries)
 {
-    if (!entry.valid()) {
+    const auto end = entries.crend();
+
+    for (auto iterator = entries.crbegin(); iterator != end; iterator++) {
+        const auto& entry = *iterator;
+
+        if (!entry.null()) {
+            file_stream << entry << "\n";
+
+            if (file_stream.fail()) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+bool entries::overwrite(uint which, const entries::entry& entry)
+{
+    if (!entry.null() && !entry.valid()) {
         return false;
     }
 
@@ -138,42 +157,33 @@ bool entries::overwrite_last(const entries::entry& entry)
         return false;
     }
 
-    const fs::path& temp_path = files::prepare_for_write(file_path, true);
+    const fs::path& temp_path = files::prepare_for_write(file_path);
 
     if (temp_path.empty()) {
         return false;
     }
 
-    std::fstream entries_file(temp_path.c_str(), std::ios::in | std::ios::out);
+    std::vector<entries::entry> entries = entries::read_all();
 
-    std::string line;
-    while (files::get_previous_line(entries_file, line)) {
-        if (!line.empty()) {
-            // Because files::get_previous_line() leaves the
-            // stream position at the end of the line before the line written to result,
-            // we need to manually go back to the beginning of the resulting line first.
-
-            char c;
-
-            entries_file.get(c);
-
-            if (c == '\r') {
-                entries_file.get(c);
-            }
-
-            break;
-        }
+    if (which < 0 || which >= entries.size()) {
+        return false;
     }
 
-    entries_file << entry << "\n";
+    if (entry.null()) {
+        entries.erase(entries.begin() + which);
+    } else {
+        entries[which] = entry;
+    }
 
-    if (entries_file.fail()) {
+    std::ofstream temp_file(temp_path.c_str());
+
+    if (!write_all(temp_file, entries)) {
         files::restore(file_path);
         return false;
     }
 
-    files::accept_changes(file_path);
-    return true;
+    return files::accept_changes(file_path);
+}
 }
 
 std::vector<entries::entry> entries::read_all(uint limit)

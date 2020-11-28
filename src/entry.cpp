@@ -21,6 +21,16 @@ bool entries::entry::complete() const
         && !this->activity.empty();
 }
 
+bool entries::entry::null() const
+{
+    return this->from == 0
+        && this->to == 0
+        && this->activity.empty()
+        && this->project.empty()
+        && this->tags.empty()
+        && this->comment.empty();
+}
+
 std::ostream& entries::operator<<(std::ostream& stream, const entries::entry& entry)
 {
     if (!entry.valid()) {

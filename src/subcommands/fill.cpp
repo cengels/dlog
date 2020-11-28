@@ -179,7 +179,7 @@ static int run_update(const cxxopts::ParseResult& parsedOptions)
         return 1;
     }
 
-    entries::overwrite_last(last);
+    entries::overwrite(0, last);
 
     std::cout << "Updated ";
     format::entry(std::cout, last);
@@ -255,7 +255,7 @@ int subcommands::fill::run(const cxxopts::ParseResult& parsedOptions)
     if (last.complete()) {
         entries::write(entry);
     } else {
-        entries::overwrite_last(entry);
+        entries::overwrite(0, entry);
     }
 
     std::cout << "Filled ";

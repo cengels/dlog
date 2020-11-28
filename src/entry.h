@@ -44,6 +44,9 @@ namespace entries {
          */
         bool complete() const;
 
+        /** Returns true if the time entry is uninitialized. */
+        bool null() const;
+
         friend std::ostream& operator<<(std::ostream& stream, const entry& entry);
     };
 }

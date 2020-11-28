@@ -13,7 +13,13 @@ namespace entries {
      * Appends a single entry to the back of the entries file
      * and returns a value indicating whether the operation was successful.
      */
-    bool write(const entries::entry& entry);
+    /**
+     * Overwrites the nth entry from the back of the entries file
+     * and returns a value indicating whether the operation was successful.
+     *
+     * Pass an uninitialized entry to delete the entry.
+     */
+    bool overwrite(uint which, const entries::entry& entry);
 
     /**
      * Overwrites the last entry in the entries file
