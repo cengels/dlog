@@ -190,13 +190,6 @@ int subcommands::fill::run(const cxxopts::ParseResult& parsedOptions)
         return run_update(parsedOptions);
     }
 
-    if (positionals.empty()) {
-        std::cout << "No activity specified. Use "
-                  << cli::color::command << "dlog fill -h" << cli::color::reset
-                  << " for usage syntax." << std::endl;
-        return 1;
-    }
-
     entries::entry entry = parse_entry(positionals);
 
     if (parsedOptions.count("comment") > 0) {
@@ -239,6 +232,13 @@ int subcommands::fill::run(const cxxopts::ParseResult& parsedOptions)
     if (!entry.valid()) {
         std::cout << "A time entry cannot be in the future." << std::endl;
 
+        return 1;
+    }
+
+    if (!entry.complete()) {
+        std::cout << "No activity specified. Use "
+                  << cli::color::command << "dlog fill -h" << cli::color::reset
+                  << " for usage syntax." << std::endl;
         return 1;
     }
 
