@@ -202,8 +202,8 @@ int subcommands::fill::run(const cxxopts::ParseResult& parsedOptions)
 
     entries::entry entry = parse_entry(positionals);
 
-    if (parsedOptions.count("comment") > 0) {
-        entry.comment = parsedOptions["comment"].as<std::string>();
+    if (parsedOptions.count("message") > 0) {
+        entry.comment = parsedOptions["message"].as<std::string>();
     }
 
     const entries::entry& last = entries::last();
