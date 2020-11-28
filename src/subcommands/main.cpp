@@ -54,13 +54,20 @@ std::string subcommands::main::help() const
     "Commands:"
     "\n");
 
+    const auto& last = subcommands::subcommands().end();
     for (const auto* subcommand : subcommands::subcommands()) {
         if (subcommand != this) {
             string.append("  ");
-            string.append(subcommand->command());
-            string.append(" \t");
+            std::string command = subcommand->command();
+            command.resize(8, ' ');
+            string.append(command);
+            string.append(" ");
             const std::string description = subcommand->description();
             string.append(description.substr(0, description.find('\n', 1)));
+
+            if (subcommand != (*last)) {
+                string.append("\n");
+            }
         }
     }
 

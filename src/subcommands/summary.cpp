@@ -319,16 +319,17 @@ std::string subcommands::summary::command() const
 
 std::string subcommands::summary::syntax() const
 {
-    return "[-h] [-s <string>] [-a <activity>] [-p <project>] [-t <tag>...] [-c <comment>] [-f <datetime>] [--to <datetime>] [-l <limit>]";
+    return "[-h] [-s <string>] [-a <activity>] [-p <project>] [-t <tag>...]\n"
+           "               "
+           "[-c <comment>] [-f <datetime>] [--to <datetime>] [-l <limit>]";
 }
 
 std::string subcommands::summary::description() const
 {
-    return "Finds the total time spent on certain activities or projects\n"
-           "  within a given time frame.\n"
+    return "Finds the total time spent on certain activities or projects within a given time frame.\n"
            "  You can specify multiple filters to further narrow down the result.\n"
            "  If no time frame is specified, shows the last thirty days.\n\n"
            "  Examples:\n"
-           "    dlog summary -a gaming -f \"1 week ago\"\n  (how much did I play games in the past week?)"
+           "    dlog summary -a gaming -f \"1 week ago\"  (how much did I play games in the past week?)\n"
            "    dlog summary -t healthy -t restaurant  (how much healthy food did I eat at restaurants in the past 30 days?)";
 }
