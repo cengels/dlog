@@ -22,22 +22,18 @@ namespace files {
     const std::experimental::filesystem::path dlog_file(const std::string& file_name);
 
     /**
-     * Creates a temporary (.tmp) file with the same contents as the file specified by path
-     * and returns true if successfully copied.
+     * Creates an empty temporary (.tmp) file from the file specified by path
+     * and returns this path if successfully copied.
      *
-     * Note that this function returns true even if the file does not exist. In that case,
-     * no .tmp file is created and a restore() simply deletes the newly created file.
-     *
-     * If this function returns false, this means that the file already existed but no .tmp
-     * file could be created for it. In that case, you should always abort subsequent writes.
+     * This function returns an empty path if no temp file could be created.
      */
-    bool prepare_for_write(const std::experimental::filesystem::path& path);
+    std::experimental::filesystem::path prepare_for_write(const std::experimental::filesystem::path& path, bool copy_contents = false);
 
     /** Restores the file specified by path from the .tmp file created by backup(). */
-    void restore(const std::experimental::filesystem::path& path);
+    bool restore(const std::experimental::filesystem::path& path);
 
     /** Accepts changes made to a file previously prepared for write by removing the associated .tmp file. */
-    void accept_changes(const std::experimental::filesystem::path& path);
+    bool accept_changes(const std::experimental::filesystem::path& path);
 
     /**
      * Writes the last line of the specified file stream to result

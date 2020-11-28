@@ -4,11 +4,13 @@
 #include "files.h"
 #include "entries.h"
 
+namespace fs = std::experimental::filesystem;
+
 namespace {
-    std::experimental::filesystem::path m_entries_file_path;
+    fs::path m_entries_file_path;
 }
 
-std::experimental::filesystem::path& entries_file_path()
+fs::path& entries_file_path()
 {
     if (m_entries_file_path.empty()) {
         m_entries_file_path = files::dlog_file("entries");
@@ -76,7 +78,7 @@ static entries::entry parse(const std::string& line)
 
 entries::entry entries::last()
 {
-    const std::experimental::filesystem::path& file_path = entries_file_path();
+    const fs::path& file_path = entries_file_path();
 
     if (file_path.empty()) {
         return entries::entry();
@@ -97,17 +99,19 @@ bool entries::write(const entries::entry& entry)
         return false;
     }
 
-    const std::experimental::filesystem::path& file_path = entries_file_path();
+    const fs::path& file_path = entries_file_path();
 
     if (file_path.empty()) {
         return false;
     }
 
-    if (!files::prepare_for_write(file_path)) {
+    const fs::path& temp_path = files::prepare_for_write(file_path, true);
+
+    if (temp_path.empty()) {
         return false;
     }
 
-    std::fstream entries_file(file_path.c_str(), std::ios::in | std::ios::out);
+    std::fstream entries_file(temp_path.c_str(), std::ios::in | std::ios::out);
     files::append_to_last_line(entries_file);
 
     entries_file << entry << "\n";
@@ -127,17 +131,19 @@ bool entries::overwrite_last(const entries::entry& entry)
         return false;
     }
 
-    const std::experimental::filesystem::path& file_path = entries_file_path();
+    const fs::path& file_path = entries_file_path();
 
     if (file_path.empty()) {
         return false;
     }
 
-    if (!files::prepare_for_write(file_path)) {
+    const fs::path& temp_path = files::prepare_for_write(file_path, true);
+
+    if (temp_path.empty()) {
         return false;
     }
 
-    std::fstream entries_file(file_path.c_str(), std::ios::in | std::ios::out);
+    std::fstream entries_file(temp_path.c_str(), std::ios::in | std::ios::out);
 
     std::string line;
     while (files::get_previous_line(entries_file, line)) {
@@ -172,7 +178,7 @@ bool entries::overwrite_last(const entries::entry& entry)
 std::vector<entries::entry> entries::read_all(uint limit)
 {
     std::vector<entries::entry> entries;
-    const std::experimental::filesystem::path& file_path = entries_file_path();
+    const fs::path& file_path = entries_file_path();
 
     if (file_path.empty()) {
         return entries;

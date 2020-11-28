@@ -103,38 +103,47 @@ const fs::path files::dlog_file(const std::string& file_name)
     return file;
 }
 
-bool files::prepare_for_write(const fs::path& path)
+fs::path files::prepare_for_write(const fs::path& path, bool copy_contents)
 {
-    if (!fs::exists(path)) {
-        return true;
+    fs::path tmp(path);
+    tmp.concat(".tmp");
+
+    if (copy_contents && fs::exists(path)) {
+        // Must pass error here, otherwise this function will
+        // throw if there's an error (with this it just returns false).
+        std::error_code error;
+        if (!fs::copy_file(path, tmp, fs::copy_options::overwrite_existing, error)) {
+            return fs::path();
+        }
     }
 
-    fs::path tmp(path);
-    tmp.concat(".tmp");
-
-    return fs::copy_file(path, tmp, fs::copy_options::overwrite_existing);
+    return tmp;
 }
 
-void files::accept_changes(const fs::path& path)
+bool files::accept_changes(const fs::path& path)
 {
     fs::path tmp(path);
     tmp.concat(".tmp");
 
-    fs::remove(tmp);
+    std::error_code error;
+    fs::rename(tmp, path, error);
+
+    return !error;
 }
 
-void files::restore(const fs::path& path)
+bool files::restore(const fs::path& path)
 {
     fs::path tmp(path);
     tmp.concat(".tmp");
 
     if (fs::exists(tmp)) {
-        fs::copy_file(tmp, path, fs::copy_options::overwrite_existing);
-    } else {
-        // No .tmp file means the file did not exist prior to the write
-        // so we can just delete it to go back to the previous state of the file system.
-        fs::remove(path);
+        // Must pass error here, otherwise this function will
+        // throw if there's an error (with this it just returns false).
+        std::error_code error;
+        return fs::remove(tmp, error);
     }
+
+    return false;
 }
 
 bool files::get_last_line(std::istream& stream, std::string& result)
