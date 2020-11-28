@@ -24,13 +24,18 @@ namespace entries {
     bool overwrite(uint which, const entries::entry& entry);
 
     /**
-     * Overwrites the last entry in the entries file
+     * Removes the nth entry from the back of the entries file
      * and returns a value indicating whether the operation was successful.
      */
-    bool overwrite_last(const entries::entry& entry);
+    bool remove(uint which);
 
     /**
      * Reads all entries from the back of the entries file and returns them.
      */
     std::vector<entries::entry> read_all(uint limit = 0);
+
+    /**
+     * Gets a specific entry from the end.
+     */
+    entries::entry get(uint which);
 }

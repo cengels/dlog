@@ -184,6 +184,19 @@ bool entries::overwrite(uint which, const entries::entry& entry)
 
     return files::accept_changes(file_path);
 }
+
+entries::entry entries::get(uint which)
+{
+    if (which == 0) {
+        which = 1;
+    }
+
+    return entries::read_all(which).back();
+}
+
+bool entries::remove(uint which)
+{
+    return entries::overwrite(which, entries::entry());
 }
 
 std::vector<entries::entry> entries::read_all(uint limit)

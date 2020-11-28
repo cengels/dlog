@@ -43,10 +43,8 @@ int command_line::parse(int& arg_count, char **&args)
     return subcommand->run(parsedOptions);
 }
 
-bool command_line::confirm(const char* prompt)
+bool command_line::confirm()
 {
-    std::cout << prompt << " [y/n]" << std::endl;
-
     std::string input;
 
     return std::getline(std::cin, input) && (input == "y" || input == "Y");
