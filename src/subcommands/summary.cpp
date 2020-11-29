@@ -231,7 +231,7 @@ static void print_results(std::ostream& stream, const summary_results& results, 
         std::string activity = activity_project.first.substr(0, divider_position);
         std::string project = activity_project.first.substr(divider_position + 1);
         stream << "    " << cli::color::activity << activity << cli::color::reset
-                  << ":" << cli::color::project << std::setw(FIELD_WIDTH - activity.size()) << project
+                  << ":" << cli::color::project << std::setw(FIELD_WIDTH - activity.size() - 1) << project
                   << cli::color::reset << " " << cli::color::duration << std::right
                   << std::setw(DURATION_WIDTH) << format::as_duration(activity_project.second, true)
                   << std::left << cli::color::reset << "\n";
