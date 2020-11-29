@@ -40,12 +40,16 @@ cxxopts::Options subcommands::summary::options() const
         ("f,from", "Only summarize entries after this date-time string.", cxxopts::value<std::string>()->default_value("30 days ago"))
         ("to", "Only summarize entries before this date-time string.", cxxopts::value<std::string>()->default_value(std::string()))
         ("l,limit", "Only summarize the last n entries matching the filters.", cxxopts::value<int>()->default_value("0"))
+        ("d,day", "Summarizes all entries of the past 24 hours.")
+        ("w,week", "Summarizes all entries of the past 7 days.")
+        ("y,year", "Summarizes all entries in the past 365 days.")
+        ("all", "Summarizes all entries.")
         ("P,no-pager", "Directs output to the standard output instead of the default pager.");
 
     return opts;
 }
 
-static bool validate(const time_t& from, const time_t& to, int limit)
+static bool validate(const time_t& from, const time_t& to)
 {
     if (from == 0) {
         std::cout << "Invalid datetime for -f. Use -h for help." << std::endl;
@@ -59,11 +63,6 @@ static bool validate(const time_t& from, const time_t& to, int limit)
 
     if (from >= to) {
         std::cout << "Invalid time frame. Start must come before end." << std::endl;
-        return false;
-    }
-
-    if (limit < 0) {
-        std::cout << "Limit (-l) must be positive." << std::endl;
         return false;
     }
 
@@ -265,13 +264,60 @@ int subcommands::summary::run(const cxxopts::ParseResult& parsedOptions)
     filter_entry.project = parsedOptions["p"].as<std::string>();
     filter_entry.tags = parsedOptions["t"].as<std::vector<std::string>>();
     filter_entry.comment = parsedOptions["c"].as<std::string>();
-    const std::string from_string = parsedOptions["f"].as<std::string>();
-    const std::string to_string = parsedOptions["to"].as<std::string>();
-    filter_entry.from = parser::parse_temporal(from_string);
-    filter_entry.to = to_string.empty() ? std::time(nullptr) : parser::parse_temporal(to_string);
+
+    if (parsedOptions.count("d") != 0) {
+        filter_entry.from = parser::parse_temporal("1 day ago");
+    }
+
+    if (parsedOptions.count("w") != 0) {
+        if (filter_entry.from > 0) {
+            std::cout << "You must specify only one of: -d, -w, -y, --all, (-f, --to)" << std::endl;
+            return 1;
+        }
+
+        filter_entry.from = parser::parse_temporal("1 week ago");
+    }
+
+    if (parsedOptions.count("y") != 0) {
+        if (filter_entry.from > 0) {
+            std::cout << "You must specify only one of: -d, -w, -y, --all, (-f, --to)" << std::endl;
+            return 1;
+        }
+
+        filter_entry.from = parser::parse_temporal("365 days ago");
+    }
+
+    bool all = parsedOptions.count("all") != 0;
+
+    if (all && filter_entry.from > 0) {
+        std::cout << "You must specify only one of: -d, -w, -y, --all, (-f, --to)" << std::endl;
+        return 1;
+    }
+
+    if (all || filter_entry.from > 0) {
+        if (parsedOptions.count("f") != 0 || parsedOptions.count("to") != 0) {
+            std::cout << "You must specify only one of: -d, -w, -y, --all, (-f, --to)" << std::endl;
+            return 1;
+        }
+
+        filter_entry.to = std::time(nullptr);
+    }
+
+    if (!all && filter_entry.from == 0) {
+        const std::string from_string = parsedOptions["f"].as<std::string>();
+        const std::string to_string = parsedOptions["to"].as<std::string>();
+        filter_entry.from = parser::parse_temporal(from_string);
+        filter_entry.to = to_string.empty() ? std::time(nullptr) : parser::parse_temporal(to_string);
+
+        if (!validate(filter_entry.from, filter_entry.to)) {
+            return 1;
+        }
+    }
+
     int limit = parsedOptions["l"].as<int>();
 
-    if (!validate(filter_entry.from, filter_entry.to, limit)) {
+    if (limit < 0) {
+        std::cout << "Limit (-l) must be positive." << std::endl;
         return 1;
     }
 
@@ -321,7 +367,9 @@ std::string subcommands::summary::syntax() const
 {
     return "[-h] [-s <string>] [-a <activity>] [-p <project>] [-t <tag>...]\n"
            "               "
-           "[-c <comment>] [-f <datetime>] [--to <datetime>] [-l <limit>]";
+           "[-c <comment>] [-f <datetime>] [--to <datetime>] [-l <limit>]"
+           "               "
+           "[--day, -d] [--week, -w] [--year, -y] [--all]";
 }
 
 std::string subcommands::summary::description() const
@@ -330,6 +378,6 @@ std::string subcommands::summary::description() const
            "  You can specify multiple filters to further narrow down the result.\n"
            "  If no time frame is specified, shows the last thirty days.\n\n"
            "  Examples:\n"
-           "    dlog summary -a gaming -f \"1 week ago\"  (how much did I play games in the past week?)\n"
+           "    dlog summary -a gaming -f \"3 days ago\"  (how much did I play games in the past 3 days?)\n"
            "    dlog summary -t healthy -t restaurant  (how much healthy food did I eat at restaurants in the past 30 days?)";
 }
