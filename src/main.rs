@@ -1,8 +1,8 @@
 use clap::Clap;
 use subcommands::Subcommand;
 
-#[path = "subcommands/subcommands.rs"]
 mod subcommands;
+mod entries;
 
 fn main() {
     let subcommand: subcommands::Subcommands = subcommands::Subcommands::parse();
