@@ -1,7 +1,6 @@
 use clap::Clap;
 use enum_dispatch::enum_dispatch;
-
-mod log;
+use super::Log;
 
 #[enum_dispatch]
 pub trait Subcommand {
@@ -13,5 +12,5 @@ pub trait Subcommand {
 #[derive(Clap)]
 #[clap()]
 pub enum Subcommands {
-    Log(log::Log)
+    Log(Log)
 }
