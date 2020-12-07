@@ -1,3 +1,4 @@
+use std::error::Error;
 use clap::Clap;
 use enum_dispatch::enum_dispatch;
 use super::Log;
@@ -5,7 +6,7 @@ use super::Log;
 #[enum_dispatch]
 pub trait Subcommand {
     /// Runs the subcommand with the parsed arguments.
-    fn run(&self);
+    fn run(&self) -> Result<(), Box<dyn Error>>;
 }
 
 #[enum_dispatch(Subcommand)]

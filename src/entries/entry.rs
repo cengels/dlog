@@ -1,32 +1,39 @@
-use serde::{Serialize, Deserialize};
-use chrono::{Utc, DateTime};
+use std::fmt::Display;
+use colored::Colorize;
+use serde::{Deserialize, Serialize};
+use chrono::{DateTime, Duration, Local, Utc, serde::ts_seconds};
 
-#[derive(Serialize, Deserialize)]
-pub struct Entry<'a> {
+use crate::format;
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Entry {
     /// A POSIX time point defining the start of the time entry.
-    from: DateTime<Utc>,
+    #[serde(with = "ts_seconds")]
+    pub from: DateTime<Utc>,
     /// A POSIX time point defining the end of the time entry.
-    to: DateTime<Utc>,
+    #[serde(with = "ts_seconds")]
+    pub to: DateTime<Utc>,
     /// The activity committed during this time entry.
     /// Must not be an empty string unless the time entry is incomplete.
-    activity: &'a str,
+    pub activity: String,
     /// The project the activity was committed in.
     /// Can be an empty string to mean that the activity does not belong
     /// to a project.
-    project: &'a str,
+    pub project: String,
     /// A variable number of tags that belong to this time entry.
-    tags: Vec<&'a str>,
+    #[serde(with = "vector_format")]
+    pub tags: Vec<String>,
     /// An optional entry comment.
-    comment: &'a str
+    pub comment: String
 }
 
-impl Entry<'_> {
+impl Entry {
     /// Returns `true` if this time entry is valid.
     pub fn valid(&self) -> bool {
         let now = Utc::now();
 
-        self.from.timestamp_millis() > 0  // from must not be uninitialized
-         && (self.to.timestamp_millis() == 0 || self.to >= self.from)  // to must be uninitialized or greater than from
+        self.from.timestamp() > 0  // from must not be uninitialized
+         && (self.to.timestamp() == 0 || self.to >= self.from)  // to must be uninitialized or greater than from
          && self.from <= now  // from must be smaller than now
          && self.to <= now  // to must be smaller than now
     }
@@ -35,17 +42,97 @@ impl Entry<'_> {
     /// if it has both a start and an end point.
     pub fn complete(&self) -> bool {
         self.valid()
-         && self.to.timestamp_millis() > 0
+         && self.to.timestamp() > 0
          && !self.activity.is_empty()
     }
 
     /// Returns `true` if the time entry is uninitialized.
     pub fn null(&self) -> bool {
-        self.from.timestamp_millis() == 0
-         && self.to.timestamp_millis() == 0
+        self.from.timestamp() == 0
+         && self.to.timestamp() == 0
          && self.activity.is_empty()
          && self.project.is_empty()
          && self.tags.is_empty()
          && self.comment.is_empty()
+    }
+
+    /// Gets `from` in local time.
+    pub fn local_from(&self) -> DateTime<Local> {
+        self.from.with_timezone(&Local)
+    }
+
+    /// Gets `to` in local time.
+    pub fn local_to(&self) -> DateTime<Local> {
+        self.to.with_timezone(&Local)
+    }
+
+    /// Gets the duration of this time entry.
+    pub fn duration(&self) -> Duration {
+        if !self.complete() || !self.valid() {
+            return Duration::zero();
+        }
+
+        self.to - self.from
+    }
+}
+
+const ACTIVITY_LENGTH: usize = 56;
+
+impl Display for Entry {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let duration = format::duration(&self.duration());
+
+        let activity_project = if self.project.is_empty() {
+            self.activity.cyan().to_string()
+        } else {
+            format!("{}:{}", self.activity.cyan(), self.project.bright_red())
+        };
+
+        let tags = if self.tags.is_empty() {
+            String::new()
+        } else {
+            format!("[{}]", self.tags.iter().map(|tag| tag.bright_yellow().to_string()).collect::<Vec<String>>().join(", "))
+        };
+
+        let activity_length = if !self.project.is_empty() {
+            ACTIVITY_LENGTH
+        } else {
+            // We have to subtract exactly 9 here for the output
+            // to be properly aligned with rows that have empty projects.
+            // There is probably a good reason why, but I don't know what it is.
+            ACTIVITY_LENGTH - 9
+        };
+
+        f.write_fmt(format_args!("{} to {} {} {:>width$}  {}",
+            self.local_from().time().to_string().magenta(),
+            self.local_to().time().to_string().magenta(),
+            format!("({})", duration),
+            activity_project,
+            tags,
+            width = activity_length
+        ))
+    }
+}
+
+mod vector_format {
+    use serde::{Deserialize, Deserializer, Serializer};
+
+    pub fn serialize<S>(vector: &Vec<String>, serializer: S) -> Result<S::Ok, S::Error>
+      where S: Serializer
+    {
+        let s = format!("\"{}\"", vector.join(","));
+        serializer.serialize_str(&s)
+    }
+
+    pub fn deserialize<'de, D>(deserializer: D) -> Result<Vec<String>, D::Error>
+      where D: Deserializer<'de>,
+    {
+        let s = String::deserialize(deserializer)?;
+
+        if s.is_empty() {
+            Ok(Vec::<String>::new())
+        } else {
+            Ok(s.split(",").map(|s| s.to_string()).collect::<Vec<String>>())
+        }
     }
 }
