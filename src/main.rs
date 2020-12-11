@@ -9,6 +9,7 @@ mod entries;
 mod files;
 mod errors;
 mod format;
+mod parser;
 
 fn main() {
     std::panic::set_hook(Box::new(|info| {

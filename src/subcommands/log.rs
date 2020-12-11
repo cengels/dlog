@@ -8,7 +8,7 @@ use super::Subcommand;
 use crate::{entries, format};
 
 /// Prints a log of the last n (or all if -l is not specified) entries.
-#[derive(Clap)]
+#[derive(Clap, Debug)]
 pub struct Log {
     /// Prints the entries without a pager. Note that this may flood your terminal.
     #[clap(short = 'P', long)]

@@ -11,9 +11,8 @@ pub struct Start;
 impl Subcommand for Start {
     fn run(&self) -> Result<(), Box<dyn Error>> {
         let mut entries = entries::read_all()?;
-        let maybe_last = entries.last();
 
-        if let Some(last) = maybe_last {
+        if let Some(last) = entries.last() {
             if !last.complete() {
                 return Err(Box::new(errors::IncompleteEntryError))
             }
