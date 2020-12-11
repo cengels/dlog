@@ -29,6 +29,11 @@ impl Subcommand for Log {
 
         let entries = entries::read_all()?;
 
+        if entries.is_empty() {
+            println!("No entries yet!");
+            return Ok(());
+        }
+
         let mut day = Utc::now().date();
         let mut day_entries = Vec::<&Entry>::new();
         let mut counter = 0;
