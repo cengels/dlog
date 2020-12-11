@@ -25,7 +25,7 @@ fn main() {
         // but that's okay because the program is set to end after
         // the pager executes anyway.
         if !msg.contains("Broken pipe") {
-            eprintln!("{}: {}", "error".red(), msg);
+            eprintln!("{}: {}", "error".red(), msg.trim_start_matches("error: "));
         }
     }));
 
@@ -36,6 +36,6 @@ fn main() {
     let subcommand: subcommands::Subcommands = subcommands::Subcommands::parse();
 
     if let Err(error) = subcommand.run() {
-        eprintln!("{}: {}", "error".red(), error);
+        eprintln!("{}: {}", "error".red(), error.to_string().trim_start_matches("error: "));
     }
 }
