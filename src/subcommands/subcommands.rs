@@ -1,5 +1,5 @@
 use std::error::Error;
-use clap::Clap;
+use clap::{Clap, crate_version, crate_description};
 use enum_dispatch::enum_dispatch;
 use super::{Log, Start};
 
@@ -11,7 +11,7 @@ pub trait Subcommand {
 
 #[enum_dispatch(Subcommand)]
 #[derive(Clap)]
-#[clap()]
+#[clap(version = crate_version!(), about = crate_description!())]
 pub enum Subcommands {
     Log(Log),
     Start(Start)
