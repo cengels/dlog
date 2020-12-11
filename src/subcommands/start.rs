@@ -4,6 +4,7 @@ use entries::Entry;
 use super::Subcommand;
 use crate::{entries, errors};
 
+/// Starts a new incomplete time entry. Call dlog fill to stop it.
 #[derive(Clap)]
 pub struct Start;
 
