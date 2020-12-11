@@ -1,7 +1,7 @@
 use std::fmt::Display;
 use colored::Colorize;
 use serde::{Deserialize, Serialize};
-use chrono::{DateTime, Duration, Local, Utc, serde::ts_seconds};
+use chrono::{DateTime, Duration, Local, NaiveDateTime, Utc, serde::ts_seconds};
 
 use crate::format;
 
@@ -28,6 +28,19 @@ pub struct Entry {
 }
 
 impl Entry {
+    /// Creates a new incomplete time entry.
+    /// Incomplete time entries only have a start point.
+    pub fn new() -> Entry {
+        Entry {
+            from: Utc::now(),
+            to: DateTime::<Utc>::from_utc(NaiveDateTime::from_timestamp(0, 0), Utc),
+            activity: String::new(),
+            project: String::new(),
+            tags: Vec::new(),
+            comment: String::new()
+        }
+    }
+
     /// Returns `true` if this time entry is valid.
     pub fn valid(&self) -> bool {
         let now = Utc::now();
@@ -120,8 +133,7 @@ mod vector_format {
     pub fn serialize<S>(vector: &Vec<String>, serializer: S) -> Result<S::Ok, S::Error>
       where S: Serializer
     {
-        let s = format!("\"{}\"", vector.join(","));
-        serializer.serialize_str(&s)
+        serializer.serialize_str(&vector.join(","))
     }
 
     pub fn deserialize<'de, D>(deserializer: D) -> Result<Vec<String>, D::Error>

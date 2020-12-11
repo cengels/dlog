@@ -1,9 +1,7 @@
 use std::error::Error;
 
-use super::Entry;
+use super::{ENTRY_FILE, Entry};
 use crate::files;
-
-const ENTRY_FILE: &str = "entries";
 
 pub fn read_all() -> Result<Vec<Entry>, Box<dyn Error>> {
     let path = files::path(ENTRY_FILE)?;
@@ -12,7 +10,6 @@ pub fn read_all() -> Result<Vec<Entry>, Box<dyn Error>> {
         .from_path(path)?;
 
     reader.deserialize()
-        // .map(|x| -> Result<ResultTuple, Box<dyn Error>> { Ok(x?) })
         .map(|x| -> Result<Entry, Box<dyn Error>> { Ok(x?) })
         .collect()
 }

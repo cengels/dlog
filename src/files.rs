@@ -26,10 +26,22 @@ fn base_path() -> Result<PathBuf, std::io::Error> {
     Ok(path)
 }
 
+/// Attempts to find the appropriate file path for the specified file
+/// in dlog's own data directory.
 pub fn path(file: &str) -> Result<PathBuf, std::io::Error> {
     let mut path = base_path()?;
 
     path.push(file);
+
+    Ok(path)
+}
+
+/// Attempts to find the appropriate temporary file path for the specified file
+/// in dlog's own data directory, used to write a file before replacing the real file with it.
+pub fn tmp_path(file: &str) -> Result<PathBuf, std::io::Error> {
+    let mut path = path(file)?;
+
+    path.set_extension("tmp");
 
     Ok(path)
 }

@@ -1,7 +1,7 @@
 use std::error::Error;
 use clap::Clap;
 use enum_dispatch::enum_dispatch;
-use super::Log;
+use super::{Log, Start};
 
 #[enum_dispatch]
 pub trait Subcommand {
@@ -13,5 +13,6 @@ pub trait Subcommand {
 #[derive(Clap)]
 #[clap()]
 pub enum Subcommands {
-    Log(Log)
+    Log(Log),
+    Start(Start)
 }
