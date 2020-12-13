@@ -76,7 +76,7 @@ impl Log {
             println!("{}\n", format::date(&first.from.date()));
 
             for entry in entries.iter().rev() {
-                println!("    {}", entry);
+                println!("    {}", entry.tabular());
 
                 if self.comments && !entry.comment.is_empty() {
                     println!("      {}", entry.comment.bright_cyan());

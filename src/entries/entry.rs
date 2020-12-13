@@ -87,12 +87,10 @@ impl Entry {
 
         self.to - self.from
     }
-}
 
-const ACTIVITY_LENGTH: usize = 56;
-
-impl Display for Entry {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    /// Gets a colorized string representation of this entry
+    /// that can be used as part of a table.
+    pub fn tabular(&self) -> String {
         let duration = format::duration(&self.duration());
 
         let activity_project = if self.project.is_empty() {
@@ -116,13 +114,41 @@ impl Display for Entry {
             ACTIVITY_LENGTH - 9
         };
 
-        f.write_fmt(format_args!("{} to {} {} {:>width$}  {}",
+        format!("{} to {} {} {:>width$}  {}",
             self.local_from().time().to_string().magenta(),
             self.local_to().time().to_string().magenta(),
             format!("({})", duration),
             activity_project,
             tags,
             width = activity_length
+        )
+    }
+}
+
+const ACTIVITY_LENGTH: usize = 56;
+
+impl Display for Entry {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let duration = format::duration(&self.duration());
+
+        let activity_project = if self.project.is_empty() {
+            self.activity.cyan().to_string()
+        } else {
+            format!("{}:{}", self.activity.cyan(), self.project.bright_red())
+        };
+
+        let tags = if self.tags.is_empty() {
+            String::new()
+        } else {
+            format!(" {}", self.tags.iter().map(|tag| (String::from("+") + tag).bright_yellow().to_string()).collect::<Vec<String>>().join(" "))
+        };
+
+        f.write_fmt(format_args!("{}{} from {} to {} {}",
+            activity_project,
+            tags,
+            self.local_from().time().to_string().magenta(),
+            self.local_to().time().to_string().magenta(),
+            format!("({})", duration)
         ))
     }
 }

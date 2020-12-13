@@ -23,6 +23,11 @@ pub struct Fill {
     /// Updates the last entry instead of adding a new one.
     #[clap(short = 'u', long)]
     update: bool,
+    /// A mandatory activity optionally followed by a project and tags
+    /// in the format of "ACTIVITY:PROJECT +TAG1 +TAG2".
+    ///
+    /// All components (the activity, project, and tags) can have
+    /// spaces in-between them.
     positionals: Vec<String>
 }
 
