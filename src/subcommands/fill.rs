@@ -32,12 +32,13 @@ impl Subcommand for Fill {
         let last = entries.last().ok_or(errors::NoEntryError)?;
         let new_entry = self.parse_entry(&last)?;
 
-        println!("self: {:?}", self);
-        println!("entry: {:?}", new_entry);
+        if self.update {
+            entries.remove(entries.len() - 1);
+        }
 
-        // entries.push(new_entry);
+        entries.push(new_entry);
 
-        // entries::rewrite(&entries)?;
+        entries::rewrite(&entries)?;
 
         Ok(())
     }
