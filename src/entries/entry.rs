@@ -5,7 +5,7 @@ use chrono::{DateTime, Duration, Local, NaiveDateTime, Utc, serde::ts_seconds};
 
 use crate::format;
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Entry {
     /// A POSIX time point defining the start of the time entry.
     #[serde(with = "ts_seconds")]
