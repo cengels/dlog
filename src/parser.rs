@@ -1,4 +1,4 @@
-use chrono::{DateTime, Duration, NaiveDate, NaiveTime, TimeZone, Utc};
+use chrono::{DateTime, Duration, Local, NaiveTime, TimeZone, Utc};
 
 use crate::errors;
 
@@ -7,10 +7,10 @@ pub fn parse_datetime(string: &str) -> Result<DateTime<Utc>, errors::InvalidForm
 
     DateTime::parse_from_rfc2822(&trimmed)
         .or(DateTime::parse_from_rfc3339(&trimmed))
-        .map(|x| { x.with_timezone(&Utc) })
-        .or(Utc.datetime_from_str(&trimmed, "%Y-%m-%d %H:%M:%S"))
-        .or(NaiveTime::parse_from_str(&trimmed, "%H:%M:%S").map(|x| { Utc::today().and_time(x).expect("invalid format") }))
-        .or(NaiveDate::parse_from_str(&trimmed, "%Y-%m-%d").map(|x| { Utc.from_utc_datetime(&x.and_time(Utc::now().time())) }))
+        .map(|x| { x.with_timezone(&Local) })
+        .or(Local.datetime_from_str(&trimmed, "%Y-%m-%d %H:%M:%S"))
+        .or(NaiveTime::parse_from_str(&trimmed, "%H:%M:%S").map(|x| { Local::today().and_time(x).expect("invalid format") }))
+        .map(|x| { x.with_timezone(&Utc)})
         .map_err(|_| { errors::InvalidFormatError("[%Y-%m-%d] [%H:%M:%S]".into()) })
 }
 
