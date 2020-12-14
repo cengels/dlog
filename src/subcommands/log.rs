@@ -1,25 +1,25 @@
 use std::error::Error;
-use chrono::{Utc};
+use chrono::Utc;
 use clap::Clap;
 use colored::Colorize;
 use entries::Entry;
-use pager::{Pager};
+use pager::Pager;
 use super::Subcommand;
 use crate::{entries, format};
 
 /// Prints a log of the last n (or all if -l is not specified) entries.
 #[derive(Clap, Debug)]
 pub struct Log {
-    /// Prints the entries without a pager. Note that this may flood your terminal.
-    #[clap(short = 'P', long)]
-    no_pager: bool,
+    /// Limits the printed entries to the last n entries.
+    #[clap(short, long, default_value = "0")]
+    limit: u32,
     /// Shows comments as well. Comments are hidden by default to allow for more
     /// compact formatting.
     #[clap(short, long)]
     comments: bool,
-    /// Limits the printed entries to the last n entries.
-    #[clap(short, long, default_value = "0")]
-    limit: u32
+    /// Prints the entries without a pager. Note that this may flood your terminal.
+    #[clap(short = 'P', long)]
+    no_pager: bool
 }
 
 impl Subcommand for Log {
