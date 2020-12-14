@@ -41,9 +41,15 @@ impl Subcommand for Fill {
             entries.remove(entries.len() - 1);
         }
 
-        entries.push(new_entry);
+        entries.push(new_entry.clone());
 
         entries::rewrite(&entries)?;
+
+        if self.update {
+            println!("Updated entry {}.", &new_entry);
+        } else {
+            println!("Filled entry {}.", &new_entry);
+        }
 
         Ok(())
     }
