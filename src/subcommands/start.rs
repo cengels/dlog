@@ -25,7 +25,11 @@ impl Subcommand for Start {
 
         entries::rewrite(&entries)?;
 
-        println!("Started new incomplete time entry at {}.", &from);
+        if from.contains("at") {
+            println!("Started new incomplete time entry {}.", &from);
+        } else {
+            println!("Started new incomplete time entry at {}.", &from);
+        }
 
         Ok(())
     }
