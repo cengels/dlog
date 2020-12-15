@@ -1,5 +1,5 @@
 [package]
-name = "dlog-rust"
+name = "dlog"
 version = "0.1.0"
 authors = ["cengels <cengels@tuta.io>"]
 edition = "2018"
