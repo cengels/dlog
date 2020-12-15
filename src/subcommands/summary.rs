@@ -1,5 +1,5 @@
 use std::{cmp::Ordering, collections::HashMap, error::Error, vec::IntoIter};
-use chrono::{DateTime, Duration, NaiveDateTime, Utc};
+use chrono::{DateTime, Duration, NaiveDateTime, Timelike, Utc};
 use clap::Clap;
 use colored::Colorize;
 use entries::{Entry, EntryCore};
@@ -129,7 +129,7 @@ impl Summary {
     }
 
     fn to(&self) -> DateTime<Utc> {
-        self.to.unwrap_or_else(|| Utc::now())
+        self.to.unwrap_or_else(|| Utc::now().with_nanosecond(0).unwrap())
     }
 
     fn is_filtered(&self, entry: &Entry, entry_core: &EntryCore) -> bool {

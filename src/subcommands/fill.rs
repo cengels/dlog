@@ -1,5 +1,5 @@
 use std::error::Error;
-use chrono::{DateTime, Duration, Utc};
+use chrono::{DateTime, Duration, Timelike, Utc};
 use clap::Clap;
 use entries::Entry;
 use super::Subcommand;
@@ -74,7 +74,7 @@ impl Fill {
         if let Some(to) = self.to {
             entry.to = to;
         } else {
-            entry.to = Utc::now();
+            entry.to = Utc::now().with_nanosecond(0).unwrap();
         }
 
         if let Some(from) = self.from {
