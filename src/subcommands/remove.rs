@@ -1,7 +1,7 @@
 use std::{error::Error, io::Write};
 use clap::Clap;
 use super::Subcommand;
-use crate::{entries, errors};
+use crate::{entries, errors, format};
 
 /// Removes a time entry from the list.
 ///
@@ -37,10 +37,15 @@ impl Subcommand for Remove {
             return Err(clap::Error::with_description("No entry with the specified index found.".into(), clap::ErrorKind::InvalidValue).into());
         }
 
-        let entry_string = opt_entry.unwrap().to_string();
+        let entry = opt_entry.unwrap();
+        let entry_string = if entry.complete() {
+            format!("entry {}", entry)
+        } else {
+            format!("incomplete entry started {}", format::datetime(&entry.from))
+        };
 
         if !self.yes {
-            print!("Do you want to remove entry {}? (y/n) ", entry_string);
+            print!("Do you want to remove {}? (y/n) ", entry_string);
             std::io::stdout().flush()?;
 
             let mut input = String::new();
@@ -57,7 +62,7 @@ impl Subcommand for Remove {
 
         entries::rewrite(&entries)?;
 
-        println!("Removed entry {}", entry_string);
+        println!("Removed {}", entry_string);
 
         Ok(())
     }
