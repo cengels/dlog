@@ -1,7 +1,7 @@
 use std::error::Error;
 use clap::{Clap, crate_version, crate_description};
 use enum_dispatch::enum_dispatch;
-use super::{Log, Start, Fill, Remove};
+use super::{Fill, Log, Remove, Start, Summary};
 
 #[enum_dispatch]
 pub trait Subcommand {
@@ -16,5 +16,6 @@ pub enum Subcommands {
     Log(Log),
     Start(Start),
     Fill(Fill),
-    Remove(Remove)
+    Remove(Remove),
+    Summary(Summary)
 }

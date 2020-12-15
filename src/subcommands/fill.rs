@@ -3,7 +3,7 @@ use chrono::{DateTime, Duration, Utc};
 use clap::Clap;
 use entries::Entry;
 use super::Subcommand;
-use crate::{entries, errors, parser::parse_datetime, parser::parse_duration};
+use crate::{entries::{self, EntryCore}, errors, parser::parse_datetime, parser::parse_duration};
 
 /// Fills the time between the last time entry and now with a new time entry.
 #[derive(Clap, Debug)]
@@ -24,11 +24,11 @@ pub struct Fill {
     #[clap(short = 'u', long)]
     update: bool,
     /// A mandatory activity optionally followed by a project and tags
-    /// in the format of "ACTIVITY:PROJECT +TAG1 +TAG2".
+    /// in the format of <activity>[:<project>] [+<tag>...].
     ///
     /// All components (the activity, project, and tags) can have
     /// spaces in-between them.
-    positionals: Vec<String>
+    activity_project_tags: Vec<String>
 }
 
 impl Subcommand for Fill {
@@ -62,42 +62,10 @@ impl Fill {
         }
 
         let mut entry: Entry = if self.update { last.clone() } else { Entry::new() };
-
-        let mut activity_project = String::new();
-        let mut tag_mode = false;
-
-        for positional in &self.positionals {
-            if !tag_mode && positional.starts_with('+') {
-                tag_mode = true;
-            }
-
-            if tag_mode {
-                if positional.starts_with('+') {
-                    entry.tags.push(positional[1..].into());
-                } else if let Some(last) = entry.tags.last_mut() {
-                    last.push(' ');
-                    last.push_str(positional);
-                }
-            } else {
-                activity_project.push(' ');
-                activity_project += positional;
-            }
-        }
-
-        activity_project = activity_project.trim().into();
-
-        if !activity_project.is_empty() {
-            let mut activity_mode = true;
-
-            for string in activity_project.splitn(2, ':') {
-                if activity_mode {
-                    entry.activity = string.to_string();
-                    activity_mode = false;
-                } else {
-                    entry.project = string.to_string();
-                }
-            }
-        }
+        let entry_core = self.activity_project_tags.join(" ").parse::<EntryCore>().unwrap();
+        entry.activity = entry_core.activity;
+        entry.project = entry_core.project;
+        entry.tags = entry_core.tags;
 
         if entry.activity.is_empty() {
             return Err(clap::Error::with_description("Please specify at least an activity.".into(), clap::ErrorKind::MissingRequiredArgument).into());

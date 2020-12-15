@@ -24,15 +24,15 @@ pub struct Log {
 
 impl Subcommand for Log {
     fn run(&self) -> Result<(), Box<dyn Error>> {
-        if !self.no_pager {
-            Pager::new().setup();
-        }
-
         let entries = entries::read_all()?;
 
         if entries.is_empty() {
             println!("No entries yet!");
             return Ok(());
+        }
+        
+        if !self.no_pager {
+            Pager::new().setup();
         }
 
         let mut day = Utc::now().date();

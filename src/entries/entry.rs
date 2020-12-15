@@ -1,9 +1,58 @@
-use std::fmt::Display;
+use std::{convert::Infallible, fmt::Display, str::FromStr};
 use colored::Colorize;
 use serde::{Deserialize, Serialize};
 use chrono::{DateTime, Duration, Local, NaiveDateTime, Utc, serde::ts_seconds};
 
 use crate::format;
+
+#[derive(Debug)]
+pub struct EntryCore {
+    pub activity: String,
+    pub project: String,
+    pub tags: Vec<String>
+}
+
+impl FromStr for EntryCore {
+    type Err = Infallible;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let mut activity = "";
+        let mut project = "";
+        let mut s = s;
+        let colon_index_opt = s.find(':');
+
+        if let Some(colon_index) = colon_index_opt {
+            activity = &s[0..colon_index];
+            s = &s[colon_index + 1..];
+        }
+
+        if let Some(plus_index) = s.find('+') {
+            if colon_index_opt.is_some() {
+                project = &s[0..plus_index];
+            } else {
+                activity = &s[0..plus_index];
+            }
+
+            return Ok(EntryCore {
+                activity: activity.trim().to_string(),
+                project: project.trim().to_string(),
+                tags: s[plus_index + 1..].split('+').map(|tag| tag.trim().to_string()).filter(|tag| !tag.is_empty()).collect()
+            });
+        }
+        
+        if colon_index_opt.is_some() {
+            project = &s[0..];
+        } else {
+            activity = &s[0..];
+        }
+
+        Ok(EntryCore {
+            activity: activity.trim().to_string(),
+            project: project.trim().to_string(),
+            tags: Vec::new()
+        })
+    }
+}
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Entry {
