@@ -63,9 +63,16 @@ impl Fill {
 
         let mut entry: Entry = if self.update { last.clone() } else { Entry::new() };
         let entry_core = self.activity_project_tags.join(" ").parse::<EntryCore>().unwrap();
-        entry.activity = entry_core.activity;
-        entry.project = entry_core.project;
-        entry.tags = entry_core.tags;
+        
+        if !entry_core.activity.is_empty() {
+            entry.activity = entry_core.activity;
+        }
+        if !entry_core.project.is_empty() {
+            entry.project = entry_core.project;
+        }
+        if !entry_core.tags.is_empty() {
+            entry.tags = entry_core.tags;
+        }
 
         if entry.activity.is_empty() {
             return Err(clap::Error::with_description("Please specify at least an activity.".into(), clap::ErrorKind::MissingRequiredArgument).into());
