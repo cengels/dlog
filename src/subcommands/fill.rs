@@ -102,6 +102,10 @@ impl Fill {
             entry.comment = message.to_string();
         }
 
+        if !entry.valid() {
+            return Err(errors::InvalidEntryError.into());
+        }
+
         Ok(entry)
     }
 }

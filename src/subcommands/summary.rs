@@ -3,7 +3,7 @@ use chrono::{DateTime, Duration, NaiveDateTime, Timelike, Utc};
 use clap::Clap;
 use colored::Colorize;
 use entries::{Entry, EntryCore};
-use pager::{Pager};
+use pager::Pager;
 use super::Subcommand;
 use crate::{entries, format, parser::parse_datetime};
 
@@ -79,6 +79,10 @@ impl Subcommand for Summary {
         if entries.is_empty() {
             println!("No entries yet!");
             return Ok(());
+        }
+
+        if self.to() <= self.from() {
+            return Err(clap::Error::with_description("The start point must be smaller than the end point.".to_string(), clap::ErrorKind::InvalidValue).into());
         }
 
         let statistics = self.collect_statistics(&entries);
