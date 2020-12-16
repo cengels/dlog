@@ -13,11 +13,11 @@ pub fn parse_datetime(string: &str) -> Result<DateTime<Utc>, errors::InvalidForm
         .or_else(|_| NaiveTime::parse_from_str(&trimmed, "%H:%M:%S").map_err(|_| ()).and_then(|x| { Local::today().and_time(x).ok_or(()) }))
         .map(|x| { x.with_timezone(&Utc)})
         .or_else(|_| parse_temporal_expression(&trimmed))
-        .map_err(|_| { errors::InvalidFormatError("[%Y-%m-%d] %H:%M:%S".to_string()) })
+        .map_err(|_| { errors::InvalidFormatError(String::from("[%Y-%m-%d] %H:%M:%S")) })
 }
 
 fn temporal_expression_error() -> errors::InvalidFormatError {
-    return errors::InvalidFormatError("in n seconds/minutes/hours/days OR n seconds/minutes/hours/days ago".to_string());
+    return errors::InvalidFormatError(String::from("in n seconds/minutes/hours/days OR n seconds/minutes/hours/days ago"));
 }
 
 /// Gets the factor necessary to convert the unit into seconds.
@@ -112,7 +112,7 @@ pub fn parse_duration(string: &str) -> Result<Duration, errors::InvalidFormatErr
             }
         }
 
-        return Err(errors::InvalidFormatError("ww:dd:hh:mm:ss".to_string()));
+        return Err(errors::InvalidFormatError(String::from("ww:dd:hh:mm:ss")));
     }
 
     Ok(Duration::seconds(seconds))

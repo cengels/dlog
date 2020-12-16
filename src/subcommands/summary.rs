@@ -82,7 +82,7 @@ impl Subcommand for Summary {
         }
 
         if self.to() <= self.from() {
-            return Err(clap::Error::with_description("The start point must be smaller than the end point.".to_string(), clap::ErrorKind::InvalidValue).into());
+            return Err(clap::Error::with_description(String::from("The start point must be smaller than the end point."), clap::ErrorKind::InvalidValue).into());
         }
 
         let statistics = self.collect_statistics(&entries);
@@ -186,16 +186,16 @@ impl Summary {
                 stats.total = result;
             }
             
-            set(&mut stats.activities, entry.activity.to_string(), &duration);
+            set(&mut stats.activities, entry.activity.to_owned(), &duration);
 
             if !entry.project.is_empty() {
                 set(&mut stats.activities_projects, format!("{}:{}", entry.activity, entry.project), &duration);
             }
 
-            set(&mut stats.projects, entry.project.to_string(), &duration);
+            set(&mut stats.projects, entry.project.to_owned(), &duration);
 
             for tag in &entry.tags {
-                set(&mut stats.tags, tag.to_string(), &duration);
+                set(&mut stats.tags, tag.to_owned(), &duration);
             }
 
             counter += 1;

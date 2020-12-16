@@ -99,7 +99,7 @@ impl Fill {
         }
 
         if let Some(message) = &self.message {
-            entry.comment = message.to_string();
+            entry.comment = message.to_owned();
         }
 
         if !entry.valid() {

@@ -34,9 +34,9 @@ impl FromStr for EntryCore {
             }
 
             return Ok(EntryCore {
-                activity: activity.trim().to_string(),
-                project: project.trim().to_string(),
-                tags: s[plus_index + 1..].split('+').map(|tag| tag.trim().to_string()).filter(|tag| !tag.is_empty()).collect()
+                activity: activity.trim().to_owned(),
+                project: project.trim().to_owned(),
+                tags: s[plus_index + 1..].split('+').map(|tag| tag.trim().to_owned()).filter(|tag| !tag.is_empty()).collect()
             });
         }
         
@@ -47,8 +47,8 @@ impl FromStr for EntryCore {
         }
 
         Ok(EntryCore {
-            activity: activity.trim().to_string(),
-            project: project.trim().to_string(),
+            activity: activity.trim().to_owned(),
+            project: project.trim().to_owned(),
             tags: Vec::new()
         })
     }
@@ -219,7 +219,7 @@ mod vector_format {
         if s.is_empty() {
             Ok(Vec::<String>::new())
         } else {
-            Ok(s.split(",").map(|s| s.to_string()).collect::<Vec<String>>())
+            Ok(s.split(",").map(|s| s.to_owned()).collect::<Vec<String>>())
         }
     }
 }
