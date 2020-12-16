@@ -87,7 +87,7 @@ impl Fill {
         if let Some(from) = self.from {
             entry.from = from;
         } else if !self.update {
-            entry.from = last.to.clone();
+            entry.from = last.to;
         }
 
         if let Some(duration) = self.duration {

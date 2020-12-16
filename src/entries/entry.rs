@@ -205,7 +205,7 @@ impl Display for Entry {
 mod vector_format {
     use serde::{Deserialize, Deserializer, Serializer};
 
-    pub fn serialize<S>(vector: &Vec<String>, serializer: S) -> Result<S::Ok, S::Error>
+    pub fn serialize<S>(vector: &[String], serializer: S) -> Result<S::Ok, S::Error>
       where S: Serializer
     {
         serializer.serialize_str(&vector.join(","))
@@ -219,7 +219,7 @@ mod vector_format {
         if s.is_empty() {
             Ok(Vec::<String>::new())
         } else {
-            Ok(s.split(",").map(|s| s.to_owned()).collect::<Vec<String>>())
+            Ok(s.split(',').map(|s| s.to_owned()).collect::<Vec<String>>())
         }
     }
 }

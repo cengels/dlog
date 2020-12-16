@@ -102,7 +102,7 @@ fn set(map: &mut HashMap<String, Duration>, key: String, duration: &Duration) {
             map.insert(key, new_duration);
         }
     } else {
-        map.insert(key, duration.clone());
+        map.insert(key, *duration);
     }
 }
 
@@ -163,7 +163,7 @@ impl Summary {
         false
     }
 
-    fn collect_statistics(&self, entries: &Vec<Entry>) -> Statistics {
+    fn collect_statistics(&self, entries: &[Entry]) -> Statistics {
         let entry_core = self.activity_project_tags.join(" ").parse::<EntryCore>().unwrap();
         let to = self.to();
         let from = self.from();

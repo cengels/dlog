@@ -1,7 +1,7 @@
 use super::{ENTRY_FILE, Entry};
 use crate::files;
 
-pub fn rewrite(entries: &Vec<Entry>) -> Result<(), std::io::Error> {
+pub fn rewrite(entries: &[Entry]) -> Result<(), std::io::Error> {
     let path = files::path(ENTRY_FILE)?;
     let tmp_path = files::tmp_path(ENTRY_FILE)?;
     let mut writer = csv::WriterBuilder::new()

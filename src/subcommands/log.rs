@@ -71,7 +71,7 @@ impl Subcommand for Log {
 }
 
 impl Log {
-    fn print_entries_for_day(&self, entries: &Vec<&Entry>) {
+    fn print_entries_for_day(&self, entries: &[&Entry]) {
         if let Some(first) = entries.first() {
             println!("{}\n", format::date(&first.from.date()));
 
@@ -83,7 +83,7 @@ impl Log {
                 }
             }
 
-            println!("");
+            println!();
         }
     }
 }

@@ -1,4 +1,3 @@
-use dirs;
 use std::{io::ErrorKind, path::PathBuf};
 
 const DLOG_ENV_VAR: &str = "DLOG_PATH";
