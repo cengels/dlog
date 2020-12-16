@@ -1,4 +1,4 @@
-use chrono::{DateTime, Duration, Local, NaiveTime, TimeZone, Utc};
+use chrono::{DateTime, Duration, Local, NaiveTime, TimeZone, Timelike, Utc};
 
 use crate::errors;
 
@@ -8,16 +8,18 @@ pub fn parse_datetime(string: &str) -> Result<DateTime<Utc>, errors::InvalidForm
 
     DateTime::parse_from_rfc2822(&trimmed)
         .or_else(|_| DateTime::parse_from_rfc3339(&trimmed))
+        .map_err(|_| ())
+        .and_then(|x| { x.with_nanosecond(0).ok_or(()) })
         .map(|x| { x.with_timezone(&Local) })
         .or_else(|_| Local.datetime_from_str(&trimmed, "%Y-%m-%d %H:%M:%S"))
         .or_else(|_| NaiveTime::parse_from_str(&trimmed, "%H:%M:%S").map_err(|_| ()).and_then(|x| { Local::today().and_time(x).ok_or(()) }))
         .map(|x| { x.with_timezone(&Utc)})
         .or_else(|_| parse_temporal_expression(&trimmed))
-        .map_err(|_| { errors::InvalidFormatError(String::from("[%Y-%m-%d] %H:%M:%S")) })
-}
-
-fn temporal_expression_error() -> errors::InvalidFormatError {
-    return errors::InvalidFormatError(String::from("in n seconds/minutes/hours/days OR n seconds/minutes/hours/days ago"));
+        .map_err(|e| {
+            if e.partial_match { e } else {
+                errors::InvalidFormatError::datetime(&trimmed)
+            }
+        })
 }
 
 /// Gets the factor necessary to convert the unit into seconds.
@@ -39,7 +41,6 @@ fn get_factor(s: &str) -> Option<i64> {
 /// "n seconds/minutes/hours/days/weeks/months/years ago" (past).
 fn parse_temporal_expression(string: &str) -> Result<DateTime<Utc>, errors::InvalidFormatError> {
     // You can also say "now".
-
     if string == "now" {
         return Ok(Utc::now());
     }
@@ -53,23 +54,23 @@ fn parse_temporal_expression(string: &str) -> Result<DateTime<Utc>, errors::Inva
     let segments_vec: Vec<&str> = string.split(' ').collect();
 
     if segments_vec.len() != 3 {
-        return Err(temporal_expression_error());
+        return Err(errors::InvalidFormatError::temporal_expression(string));
     }
 
     let segments: (&str, &str, &str) = (segments_vec[0], segments_vec[1], segments_vec[2]);
     let future = segments.0 == "in";
 
     if !future && segments.2 != "ago" {
-        return Err(temporal_expression_error());
+        return Err(errors::InvalidFormatError::temporal_expression(string));
     }
 
     let factor_string = if future { segments.2 } else { segments.1 };
-    let factor = get_factor(factor_string).ok_or_else(|| temporal_expression_error())?;
+    let factor = get_factor(factor_string).ok_or_else(|| errors::InvalidFormatError::temporal_expression(string))?;
     let number_string = if future { segments.1 } else { segments.0 };
-    let number: i64 = number_string.parse().map_err(|_| temporal_expression_error())?;
+    let number: i64 = number_string.parse().map_err(|_| errors::InvalidFormatError::invalid_number(number_string))?;
 
     if number <= 0 {
-        return Err(temporal_expression_error());
+        return Err(errors::InvalidFormatError::invalid_number(number_string));
     }
 
     let duration = Duration::seconds(number * factor);
@@ -91,28 +92,28 @@ const DURATION_SEGMENTS: &[i64] = &[
 /// Attempts to parse a duration string into a `Duration`.
 pub fn parse_duration(string: &str) -> Result<Duration, errors::InvalidFormatError> {
     if !string.contains(':') {
-        return Err(errors::InvalidFormatError(String::new()));
+        return Err(errors::InvalidFormatError::duration(string));
     }
 
-    let split = string.split(':')
-        .rev()  // The first can be anything depending on the number of elements, while the last is always seconds
-        .map(|number| { number.parse::<i64>() });
     let mut i = 0;
     let mut seconds: i64 = 0;
     let duration_segment_count = DURATION_SEGMENTS.len();
 
-    for number in split {
+    // The first can be anything depending on the number of elements, while the last is always seconds
+    for number in string.split(':').rev() {
         if i <= duration_segment_count {
-            if let Ok(number) = number {
+            if let Ok(number) = number.parse::<i64>() {
                 if number >= 0 && (i >= duration_segment_count - 1 || number < DURATION_SEGMENTS[i]) {
                     seconds += if i == 0 { number } else { number * DURATION_SEGMENTS[0..i].iter().product::<i64>() };
                     i += 1;
                     continue;
                 }
             }
+
+            return Err(errors::InvalidFormatError::invalid_number_with_bounds(number, DURATION_SEGMENTS[i]));
         }
 
-        return Err(errors::InvalidFormatError(String::from("ww:dd:hh:mm:ss")));
+        return Err(errors::InvalidFormatError::duration(string));
     }
 
     Ok(Duration::seconds(seconds))
