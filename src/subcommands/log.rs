@@ -1,15 +1,21 @@
 use std::error::Error;
-use chrono::Utc;
+use chrono::{DateTime, Utc};
 use clap::Clap;
 use colored::Colorize;
 use entries::Entry;
 use pager::Pager;
 use super::Subcommand;
-use crate::{entries, format};
+use crate::{entries, format, parser::parse_datetime};
 
 /// Prints a log of the last n (or all if -l is not specified) entries.
 #[derive(Clap, Debug)]
 pub struct Log {
+    /// Only prints entries after this date-time.
+    #[clap(short = 'f', long, parse(try_from_str = parse_datetime))]
+    from: Option<DateTime<Utc>>,
+    /// Only prints entries before this date-time.
+    #[clap(short = 't', long, parse(try_from_str = parse_datetime))]
+    to: Option<DateTime<Utc>>,
     /// Limits the printed entries to the last n entries.
     #[clap(short, long, default_value = "0")]
     limit: u32,
@@ -40,8 +46,12 @@ impl Subcommand for Log {
         let mut counter = 0;
 
         for entry in entries.iter().rev() {
-            if !entry.complete() || !entry.valid() {
+            if !entry.complete() || !entry.valid() || self.to.filter(|to| *to < entry.from).is_some() {
                 continue;
+            }
+
+            if self.from.filter(|from| entry.from < *from).is_some() {
+                break;
             }
 
             // We need to print the entries on a day-by-day basis.
