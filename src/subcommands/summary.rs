@@ -172,7 +172,7 @@ impl Summary {
         let mut counter = 0;
 
         for entry in entries.iter().rev() {
-            if !entry.complete() || !entry.valid() || to < entry.to || self.is_filtered(entry, &entry_core) {
+            if !entry.complete() || !entry.valid() || to < entry.from || self.is_filtered(entry, &entry_core) {
                 continue;
             }
 
