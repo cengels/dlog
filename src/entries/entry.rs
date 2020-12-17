@@ -164,8 +164,8 @@ impl Entry {
         };
 
         format!("{} to {} {} {:>width$}  {}",
-            self.local_from().time().to_string().magenta(),
-            self.local_to().time().to_string().magenta(),
+            format::time(&self.from),
+            if self.from.date() != self.to.date() { format::datetime_short(&self.to) } else { format::time(&self.to) },
             format!("({})", duration),
             activity_project,
             tags,
@@ -195,8 +195,8 @@ impl Display for Entry {
         f.write_fmt(format_args!("{}{} from {} to {} {}",
             activity_project,
             tags,
-            self.local_from().time().to_string().magenta(),
-            self.local_to().time().to_string().magenta(),
+            format::time(&self.from),
+            if self.from.date() != self.to.date() { format::datetime_short(&self.to) } else { format::time(&self.to) },
             format!("({})", duration)
         ))
     }
