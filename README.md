@@ -1,6 +1,6 @@
 <h1 align="center">dlog</h1>
 
-<p align="center">Simple command line time tracking.</p>
+<p align="center">Inverted command line time tracking.</p>
 
 ### Not another time tracking application!
 
