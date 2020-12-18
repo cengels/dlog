@@ -47,14 +47,14 @@ pub struct Summary {
     #[clap(short = 'P', long)]
     no_pager: bool,
     /// An activity and optionally project and tags in the format of
-    /// <activity>[:<project>] [+<tag>...] to filter the entries.
+    /// `<activity>[:<project>] [+<tag>...]` to filter the entries.
     ///
     /// Activity and project are always fully matched while the tags
     /// allow partial matches.
     activity_project_tags: Vec<String>
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 struct Statistics {
     total: Duration,
     activities: HashMap<String, Duration>,
@@ -246,5 +246,189 @@ impl Summary {
                 println!("{:w$} {:>dw$}", tag.0.bright_yellow(), format::duration(&tag.1), w = FIELD_WIDTH, dw = DURATION_WIDTH);
             }
         }
+    }
+}
+
+
+#[cfg(test)]
+mod test {
+    use std::collections::HashMap;
+    use chrono::{Duration, TimeZone, Utc};
+    use crate::test;
+    use super::{Statistics, Summary};
+
+    fn new_summary() -> Summary {
+        Summary {
+            // From May 1, 2012 to May 12, 2012
+            from: Utc.timestamp_opt(1335826800, 0).earliest(),
+            to: Utc.timestamp_opt(1336777199, 0).earliest(),
+            all: false,
+            week: false,
+            year: false,
+            day: false,
+            string: None,
+            comment: None,
+            limit: 0,
+            no_pager: false,
+            activity_project_tags: Vec::new()
+        }
+    }
+
+    fn stats_for(timestamp: i64, days: i64) -> Statistics {
+        let mut summary = new_summary();
+        summary.to = Some(Utc.timestamp(timestamp, 0));
+        summary.from = Some(summary.to.unwrap() - Duration::days(days));
+        summary.collect_statistics(&test::read_test_entries())
+    }
+
+    fn map(arr: &[(&str, i64)]) -> HashMap<String, Duration> {
+        arr.iter().map(|(name, number)| (String::from(*name), Duration::seconds(*number))).collect()
+    }
+
+    #[test]
+    fn test_empty_period() {
+        let stats = stats_for(1322376000, 4);
+
+        assert!(stats.activities.is_empty()
+            && stats.activities_projects.is_empty()
+            && stats.projects.is_empty()
+            && stats.tags.is_empty()
+            && stats.total.is_zero());
+    }
+
+    #[test]
+    fn test_default_args() {
+        let expected = Statistics {
+            total: Duration::seconds(416204),
+            activities: map(&[("orci vehicula", 373660), ("erat tortor", 42544)]),
+            activities_projects: map(&[("orci vehicula:cursus urna", 373660), ("erat tortor:ac", 42544)]),
+            projects: map(&[("cursus urna", 373660), ("ac", 42544)]),
+            tags: map(&[("in", 373660), ("habitasse", 373660), ("hac", 373660),
+                        ("metus", 42544), ("ut", 42544), ("sapien", 42544)])
+        };
+
+        assert_eq!(expected, new_summary().collect_statistics(&test::read_test_entries()));
+    }
+
+    #[test]
+    fn test_string() {
+        let expected = Statistics {
+            total: Duration::seconds(373660),
+            activities: map(&[("orci vehicula", 373660)]),
+            activities_projects: map(&[("orci vehicula:cursus urna", 373660)]),
+            projects: map(&[("cursus urna", 373660)]),
+            tags: map(&[("in", 373660), ("habitasse", 373660), ("hac", 373660)])
+        };
+
+        let mut summary = new_summary();
+        summary.string = Some(String::from("ass"));
+
+        assert_eq!(expected, summary.collect_statistics(&test::read_test_entries()));
+    }
+
+    #[test]
+    fn test_comment() {
+        let expected = Statistics {
+            total: Duration::seconds(42544),
+            activities: map(&[("erat tortor", 42544)]),
+            activities_projects: map(&[("erat tortor:ac", 42544)]),
+            projects: map(&[("ac", 42544)]),
+            tags: map(&[("metus", 42544), ("ut", 42544), ("sapien", 42544)])
+        };
+
+        let mut summary = new_summary();
+        summary.comment = Some(String::from("curae"));
+
+        assert_eq!(expected, summary.collect_statistics(&test::read_test_entries()));
+    }
+
+    #[test]
+    fn test_limit() {
+        let mut summary = new_summary();
+        summary.all = true;
+        summary.limit = 5;
+
+        let stats = summary.collect_statistics(&test::read_test_entries());
+        assert_eq!(stats.total, Duration::seconds(752098));
+    }
+
+    #[test]
+    fn test_activity() {
+        let mut summary = new_summary();
+        summary.all = true;
+        summary.activity_project_tags = vec![String::from("mauris")];
+
+        let stats = summary.collect_statistics(&test::read_test_entries());
+
+        assert_eq!(stats.total, Duration::seconds(3549273));
+
+        for (activity, _) in stats.activities {
+            assert_eq!(&activity, "mauris");
+        }
+
+        for (activity_project, _) in stats.activities_projects {
+            assert!(&activity_project.starts_with("mauris"));
+        }
+    }
+
+    #[test]
+    fn test_activity_project() {
+        let mut summary = new_summary();
+        summary.all = true;
+        summary.activity_project_tags = vec![String::from("eu"), String::from("interdum:nullam")];
+
+        let expected = Statistics {
+            total: Duration::seconds(86377),
+            activities: map(&[("eu interdum", 86377)]),
+            activities_projects: map(&[("eu interdum:nullam", 86377)]),
+            projects: map(&[("nullam", 86377)]),
+            tags: HashMap::new()
+        };
+
+        let stats = summary.collect_statistics(&test::read_test_entries());
+        assert_eq!(stats, expected);
+    }
+
+    #[test]
+    fn test_tags() {
+        let mut summary = new_summary();
+        summary.all = true;
+        summary.activity_project_tags = vec![String::from("+mollis"), String::from("+ut")];
+
+        let expected = Statistics {
+            total: Duration::seconds(19363),
+            activities: map(&[("platea", 19363)]),
+            activities_projects: map(&[("platea:omet turpis", 19363)]),
+            projects: map(&[("omet turpis", 19363)]),
+            tags: map(&[("quisque", 19363), ("ut", 19363), ("molestie", 19363), ("lorem", 19363), ("mollis", 19363)])
+        };
+
+        let stats = summary.collect_statistics(&test::read_test_entries());
+        assert_eq!(stats, expected);
+    }
+
+    #[test]
+    fn test_all() {
+        // The other relative period arguments (-y, -w, -d) can't be tested
+        // since they're relative to the current day and would fail on any other day.
+
+        let mut summary = new_summary();
+        summary.all = true;
+
+        let stats = summary.collect_statistics(&test::read_test_entries());
+
+        // We just pick a few entries to assert here, otherwise the assertion
+        // would span thousands of lines.
+        assert_eq!(stats.total, Duration::seconds(806924147));
+        assert_eq!(stats.activities.len(), 839);
+        assert_eq!(stats.activities.iter().fold(Duration::zero(), |acc, x| acc + *x.1), Duration::seconds(806924147));
+        assert_eq!(stats.activities_projects.len(), 2063);
+        assert_eq!(stats.projects.len(), 702);
+        assert_eq!(*stats.projects.get("felis ut").unwrap(), Duration::seconds(413035));
+        assert_eq!(*stats.projects.get("morbi porttitor").unwrap(), Duration::seconds(295106));
+        assert_eq!(stats.tags.len(), 167);
+        assert_eq!(*stats.tags.get("pellentesque").unwrap(), Duration::seconds(12448673));
+        assert_eq!(*stats.tags.get("sem").unwrap(), Duration::seconds(6927530));
+        assert_eq!(*stats.tags.get("mollis").unwrap(), Duration::seconds(397752));
     }
 }

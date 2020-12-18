@@ -12,6 +12,9 @@ mod errors;
 mod format;
 mod parser;
 
+#[cfg(test)]
+mod test;
+
 fn main() {
     std::panic::set_hook(Box::new(|info| {
         let msg = match info.payload().downcast_ref::<&'static str>() {

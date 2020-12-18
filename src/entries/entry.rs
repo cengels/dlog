@@ -1,7 +1,7 @@
 use std::{convert::Infallible, fmt::Display, str::FromStr};
 use colored::Colorize;
 use serde::{Deserialize, Serialize};
-use chrono::{DateTime, Duration, Local, NaiveDateTime, Timelike, Utc, serde::ts_seconds};
+use chrono::{DateTime, Duration, NaiveDateTime, Timelike, Utc, serde::ts_seconds};
 
 use crate::format;
 
@@ -54,7 +54,7 @@ impl FromStr for EntryCore {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct Entry {
     /// A POSIX time point defining the start of the time entry.
     #[serde(with = "ts_seconds")]
@@ -116,16 +116,6 @@ impl Entry {
          && self.project.is_empty()
          && self.tags.is_empty()
          && self.comment.is_empty()
-    }
-
-    /// Gets `from` in local time.
-    pub fn local_from(&self) -> DateTime<Local> {
-        self.from.with_timezone(&Local)
-    }
-
-    /// Gets `to` in local time.
-    pub fn local_to(&self) -> DateTime<Local> {
-        self.to.with_timezone(&Local)
     }
 
     /// Gets the duration of this time entry.
@@ -221,5 +211,75 @@ mod vector_format {
         } else {
             Ok(s.split(',').map(|s| s.to_owned()).collect::<Vec<String>>())
         }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use proptest::prelude::*;
+    use super::*;
+    use crate::test;
+
+    #[test]
+    fn test_new() {
+        let entry = Entry::new();
+        assert_eq!(entry.activity, "");
+        assert_eq!(entry.project, "");
+        assert_eq!(entry.comment, "");
+        assert!(entry.tags.is_empty());
+        assert_eq!(entry.from, Utc::now().with_nanosecond(0).unwrap());
+        assert_eq!(entry.to, DateTime::parse_from_rfc3339("1970-01-01T00:00:00Z").unwrap());
+    }
+
+    proptest! {
+        #[test]
+        fn test_valid_entry(entry in test::generate_valid_entry()) {
+            prop_assert!(entry.valid());
+        }
+    }
+
+    proptest! {
+        #[test]
+        fn test_complete_entry(entry in test::generate_complete_entry()) {
+            prop_assert!(entry.complete());
+        }
+    }
+
+    #[test]
+    fn test_newly_created_valid() {
+        let entry = Entry::new();
+        assert!(entry.valid() && !entry.complete());
+    }
+
+    #[test]
+    fn test_newly_created_with_activity(){
+        let mut entry = Entry::new();
+        entry.activity = String::from("text");
+        assert!(entry.valid() && !entry.complete());
+    }
+
+    #[test]
+    fn test_unset_from() {
+        let mut entry = Entry::new();
+        entry.from = DateTime::parse_from_rfc3339("1970-01-01T00:00:00Z").unwrap().with_timezone(&Utc);
+        assert!(!entry.valid());
+    }
+
+    #[test]
+    fn test_from_after_to() {
+        let mut entry = Entry::new();
+        entry.activity = String::from("text");
+        entry.from = DateTime::parse_from_rfc3339("2020-06-19T05:55:00Z").unwrap().with_timezone(&Utc);
+        entry.to = DateTime::parse_from_rfc3339("2020-06-18T05:55:00Z").unwrap().with_timezone(&Utc);
+        assert!(!entry.valid());
+    }
+
+    #[test]
+    fn test_future_to(){
+        let mut entry = Entry::new();
+        entry.activity = String::from("text");
+        entry.from = DateTime::parse_from_rfc3339("2020-06-19T05:55:00Z").unwrap().with_timezone(&Utc);
+        entry.to = Utc::now() + Duration::weeks(56);
+        assert!(!entry.valid());
     }
 }
