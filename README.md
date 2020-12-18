@@ -39,6 +39,21 @@ rather than when you stop, I recommend [watson](https://github.com/TailorDev/Wat
 
 Feel free to open an issue if you'd like to request a new feature or improvement!
 
+### Installation
+
+If you have Rust installed, the easiest and recommended way to install dlog is via:
+
+```bash
+cargo install dlog
+```
+
+If you don't have Rust installed, you can find Debian binaries for the latest version under the
+[Releases](https://github.com/cengels/dlog/releases) section. For any other platform, you'll
+have to install Rust and use the above command to install dlog at the moment.
+
+*Note: If you have some experience with cross-compilation bundles for Rust binaries, I'd appreciate
+any help you can render to set up installable binaries on other systems as well.*
+
 ### Entry structure
 
 Entries are stored in CSV (specify a custom directory by setting the environment variable `DLOG_PATH`)
