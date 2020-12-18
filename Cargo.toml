@@ -4,6 +4,10 @@ version = "0.1.0"
 authors = ["cengels <cengels@tuta.io>"]
 edition = "2018"
 description = "A command line utility to efficiently track where you spend your time."
+repository = "https://github.com/cengels/dlog"
+license-file = "LICENSE"
+readme = "README.md"
+keywords = ["cli", "time tracking", "command line"]
 
 [dependencies]
 clap = "3.0.0-beta.2"
