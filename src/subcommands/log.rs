@@ -71,9 +71,12 @@ impl Subcommand for Log {
             counter += 1;
 
             if self.limit != 0 && counter >= self.limit {
-                self.print_entries_for_day(&day_entries);
                 break;
             }
+        }
+
+        if !day_entries.is_empty() {
+            self.print_entries_for_day(&day_entries);
         }
 
         Ok(())
