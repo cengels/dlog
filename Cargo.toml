@@ -7,6 +7,7 @@ description = "A command line utility to efficiently track where you spend your 
 
 [dependencies]
 clap = "3.0.0-beta.2"
+clap_generate = "3.0.0-beta.2"
 enum_dispatch = "0.3.4"
 serde = { version = "1.0", features = ["derive"] }
 csv = "1.1"
