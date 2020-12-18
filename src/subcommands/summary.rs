@@ -47,7 +47,10 @@ pub struct Summary {
     #[clap(short = 'P', long)]
     no_pager: bool,
     /// An activity and optionally project and tags in the format of
-    // <activity>[:<project>] [+<tag>...] to filter the entries.
+    /// <activity>[:<project>] [+<tag>...] to filter the entries.
+    ///
+    /// Activity and project are always fully matched while the tags
+    /// allow partial matches.
     activity_project_tags: Vec<String>
 }
 
@@ -146,11 +149,11 @@ impl Summary {
             }
         }
 
-        if !entry_core.activity.is_empty() && !entry.activity.contains(&entry_core.activity) {
+        if !entry_core.activity.is_empty() && entry.activity != entry_core.activity {
             return true;
         }
 
-        if !entry_core.project.is_empty() && !entry.project.contains(&entry_core.project) {
+        if !entry_core.project.is_empty() && entry.project != entry_core.project {
             return true;
         }
 
