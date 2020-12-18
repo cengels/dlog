@@ -11,6 +11,9 @@ keywords = ["cli", "time-tracking", "command-line"]
 categories = ["command-line-utilities"]
 exclude = ["test_entries.csv", "src/test.rs"]
 
+[package.metadata.bundle]
+identifier = "com.cengels.dlog"
+
 [dependencies]
 clap = "3.0.0-beta.2"
 clap_generate = "3.0.0-beta.2"
