@@ -416,8 +416,8 @@ mod test {
         let expected = Statistics {
             total: Duration::seconds(19363),
             activities: map(&[("platea", 19363)]),
-            activities_projects: map(&[("platea:omet turpis", 19363)]),
-            projects: map(&[("omet turpis", 19363)]),
+            activities_projects: map(&[("platea:amet turpis", 19363)]),
+            projects: map(&[("amet turpis", 19363)]),
             tags: map(&[("quisque", 19363), ("ut", 19363), ("molestie", 19363), ("lorem", 19363), ("mollis", 19363)])
         };
 
