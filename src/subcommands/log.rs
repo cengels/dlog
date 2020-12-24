@@ -46,12 +46,12 @@ impl Subcommand for Log {
         let mut counter = 0;
 
         for entry in entries.iter().rev() {
-            if !entry.complete() || !entry.valid() || self.to.filter(|to| *to < entry.from).is_some() {
-                continue;
-            }
-
             if self.from.filter(|from| entry.from < *from).is_some() {
                 break;
+            }
+
+            if !entry.complete() || !entry.valid() || self.to.filter(|to| *to < entry.from).is_some() {
+                continue;
             }
 
             // We need to print the entries on a day-by-day basis.

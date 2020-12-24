@@ -54,7 +54,7 @@ pub struct Summary {
     activity_project_tags: Vec<String>
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq)]
 struct Statistics {
     total: Duration,
     activities: HashMap<String, Duration>,
@@ -185,12 +185,12 @@ impl Summary {
         let mut counter = 0;
 
         for entry in entries.iter().rev() {
-            if !entry.complete() || !entry.valid() || to < entry.from || self.is_filtered(entry, &entry_core) {
-                continue;
-            }
-
             if entry.from < from {
                 break;
+            }
+
+            if !entry.complete() || !entry.valid() || to < entry.from || self.is_filtered(entry, &entry_core) {
+                continue;
             }
 
             let duration = entry.duration();
