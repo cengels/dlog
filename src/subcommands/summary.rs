@@ -161,6 +161,12 @@ impl Summary {
             return true;
         }
 
+        if let Some(comment) = &self.comment {
+            if !entry.comment.contains(comment) {
+                return true;
+            }
+        }
+
         for tag in &entry_core.tags {
             if !entry.tags.contains(&tag) {
                 return true;
