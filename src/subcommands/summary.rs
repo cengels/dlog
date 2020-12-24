@@ -440,13 +440,13 @@ mod test {
         // We just pick a few entries to assert here, otherwise the assertion
         // would span thousands of lines.
         assert_eq!(stats.total, Duration::seconds(806924147));
-        assert_eq!(stats.activities.len(), 839);
+        assert_eq!(stats.activities.len(), 840);
         assert_eq!(stats.activities.iter().fold(Duration::zero(), |acc, x| acc + *x.1), Duration::seconds(806924147));
-        assert_eq!(stats.activities_projects.len(), 2063);
-        assert_eq!(stats.projects.len(), 702);
+        assert_eq!(stats.activities_projects.len(), 2064);
+        assert_eq!(stats.projects.len(), 703);
         assert_eq!(*stats.projects.get("felis ut").unwrap(), Duration::seconds(413035));
         assert_eq!(*stats.projects.get("morbi porttitor").unwrap(), Duration::seconds(295106));
-        assert_eq!(stats.tags.len(), 167);
+        assert_eq!(stats.tags.len(), 168);
         assert_eq!(*stats.tags.get("pellentesque").unwrap(), Duration::seconds(12448673));
         assert_eq!(*stats.tags.get("sem").unwrap(), Duration::seconds(6927530));
         assert_eq!(*stats.tags.get("mollis").unwrap(), Duration::seconds(397752));
