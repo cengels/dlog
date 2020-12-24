@@ -355,6 +355,8 @@ mod test {
     #[test]
     fn test_limit() {
         let mut summary = new_summary();
+        summary.from = None;
+        summary.to = None;
         summary.all = true;
         summary.limit = 5;
 
@@ -365,6 +367,8 @@ mod test {
     #[test]
     fn test_activity() {
         let mut summary = new_summary();
+        summary.from = None;
+        summary.to = None;
         summary.all = true;
         summary.activity_project_tags = vec![String::from("mauris")];
 
@@ -384,6 +388,8 @@ mod test {
     #[test]
     fn test_activity_project() {
         let mut summary = new_summary();
+        summary.from = None;
+        summary.to = None;
         summary.all = true;
         summary.activity_project_tags = vec![String::from("eu"), String::from("interdum:nullam")];
 
@@ -402,6 +408,8 @@ mod test {
     #[test]
     fn test_tags() {
         let mut summary = new_summary();
+        summary.from = None;
+        summary.to = None;
         summary.all = true;
         summary.activity_project_tags = vec![String::from("+mollis"), String::from("+ut")];
 
@@ -423,6 +431,8 @@ mod test {
         // since they're relative to the current day and would fail on any other day.
 
         let mut summary = new_summary();
+        summary.from = None;
+        summary.to = None;
         summary.all = true;
 
         let stats = summary.collect_statistics(&test::read_test_entries());
