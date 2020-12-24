@@ -34,6 +34,10 @@ pub fn date(date: &Date<Utc>) -> ColoredString {
 }
 
 pub fn datetime(datetime: &DateTime<Utc>) -> ColoredString {
+    if datetime.timestamp() == 0 {
+        return "the beginning of time".magenta();
+    }
+
     let today = Utc::today();
     let datetime = datetime.with_timezone(&Local);
 

@@ -1,5 +1,5 @@
 use std::{cmp::Ordering, collections::HashMap, error::Error, vec::IntoIter};
-use chrono::{DateTime, Duration, NaiveDateTime, Timelike, Utc};
+use chrono::{DateTime, Duration, Local, TimeZone, Timelike, Utc};
 use clap::Clap;
 use colored::Colorize;
 use entries::{Entry, EntryCore};
@@ -119,19 +119,23 @@ fn sort(map: &HashMap<String, Duration>) -> IntoIter<(&std::string::String, &chr
 impl Summary {
     fn from(&self) -> DateTime<Utc> {
         self.from.unwrap_or_else(|| {
-            if self.day {
-                Utc::today().and_hms(0, 0, 0)
+            if self.all {
+                return Utc.timestamp(0, 0);
+            }
+
+            let result = if self.day {
+                Local::today().and_hms(0, 0, 0)
             } else if self.week {
-                (Utc::today() - Duration::weeks(1)).and_hms(0, 0, 0)
+                (Local::today() - Duration::weeks(1)).and_hms(0, 0, 0)
             } else if self.year {
-                (Utc::today() - Duration::days(365)).and_hms(0, 0, 0)
-            } else if self.all {
-                DateTime::<Utc>::from_utc(NaiveDateTime::from_timestamp(0, 0), Utc)
+                (Local::today() - Duration::days(365)).and_hms(0, 0, 0)
             } else {
                 // Default is one month past
                 // That's also why it's not one of the CLI flags
-                (Utc::today() - Duration::days(30)).and_hms(0, 0, 0)
-            }
+                (Local::today() - Duration::days(30)).and_hms(0, 0, 0)
+            };
+
+            result.with_timezone(&Utc)
         })
     }
 
