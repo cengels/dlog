@@ -108,6 +108,15 @@ impl Entry {
          && !self.activity.is_empty()
     }
 
+    /// Returns true if the textual contents of the two entries
+    /// (i.e. excluding the start and end times) are the same.
+    pub fn content_equals(&self, other: &Entry) -> bool {
+        self.activity == other.activity
+         && self.project == other.project
+         && self.tags == other.tags
+         && self.comment == other.comment
+    }
+
     /// Returns `true` if the time entry is uninitialized.
     pub fn null(&self) -> bool {
         self.from.timestamp() == 0
@@ -275,11 +284,39 @@ mod test {
     }
 
     #[test]
-    fn test_future_to(){
+    fn test_future_to() {
         let mut entry = Entry::new();
         entry.activity = String::from("text");
         entry.from = DateTime::parse_from_rfc3339("2020-06-19T05:55:00Z").unwrap().with_timezone(&Utc);
         entry.to = Utc::now() + Duration::weeks(56);
         assert!(!entry.valid());
+    }
+
+    fn generate_entry(from: &str, to: &str) -> Entry {
+        Entry {
+            from: DateTime::parse_from_rfc3339(from).unwrap().with_timezone(&Utc),
+            to: DateTime::parse_from_rfc3339(to).unwrap().with_timezone(&Utc),
+            activity: String::from("activity"),
+            project: String::from("project"),
+            tags: vec![String::from("tag1"), String::from("tag2")],
+            comment: String::from("This is a comment.")
+        }
+    }
+
+    #[test]
+    fn test_content_equals_true() {
+        let entry1 = generate_entry("2020-12-12T08:05:00+00:00", "2020-12-12T16:02:00+00:00");
+        let entry2 = generate_entry("2020-12-12T08:05:00+00:00", "2020-12-12T16:30:00+00:00");
+        
+        assert!(entry1.content_equals(&entry2));
+    }
+
+    #[test]
+    fn test_content_equals_false() {
+        let entry1 = generate_entry("2020-12-12T08:05:00+00:00", "2020-12-12T16:02:00+00:00");
+        let mut entry2 = generate_entry("2020-12-12T08:05:00+00:00", "2020-12-12T16:30:00+00:00");
+        entry2.comment = String::from("This is also a comment.");
+        
+        assert!(!entry1.content_equals(&entry2));
     }
 }

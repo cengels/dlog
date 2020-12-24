@@ -37,8 +37,9 @@ impl Subcommand for Fill {
         let mut entries = entries::read_all()?;
         let last: Entry = entries.last().ok_or(errors::NoEntryError)?.clone();
         let new_entry = self.parse_entry(&last)?;
+        let should_update = self.update || new_entry.content_equals(&last);
 
-        if self.update {
+        if should_update {
             entries.remove(entries.len() - 1);
         }
 
@@ -46,7 +47,7 @@ impl Subcommand for Fill {
 
         entries::rewrite(&entries)?;
 
-        if self.update {
+        if should_update {
             let duration = new_entry.to - last.to;
             let sign = if duration.num_seconds().is_negative() { "" } else { "+" };
             println!("Updated entry {} {}.", &new_entry, format!("[{}{}]", sign, format::duration(&duration).clear()).bright_magenta());
@@ -81,16 +82,24 @@ impl Fill {
             return Err(clap::Error::with_description(String::from("Please specify at least an activity."), clap::ErrorKind::MissingRequiredArgument).into());
         }
 
-        if let Some(to) = self.to {
-            entry.to = to;
-        } else {
-            entry.to = Utc::now().with_nanosecond(0).unwrap();
+        if let Some(message) = &self.message {
+            entry.comment = message.to_owned();
         }
+
+        entry.to = if let Some(to) = self.to {
+            to
+        } else {
+            Utc::now().with_nanosecond(0).unwrap()
+        };
 
         if let Some(from) = self.from {
             entry.from = from;
         } else if !self.update {
-            entry.from = last.to;
+            entry.from = if entry.content_equals(last) {
+                last.from
+            } else {
+                last.to
+            }
         }
 
         if let Some(duration) = self.duration {
@@ -99,10 +108,6 @@ impl Fill {
             } else {
                 entry.to = entry.from + duration;
             }
-        }
-
-        if let Some(message) = &self.message {
-            entry.comment = message.to_owned();
         }
 
         if !entry.valid() {
