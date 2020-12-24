@@ -1,7 +1,7 @@
 use std::{convert::Infallible, fmt::Display, str::FromStr};
 use colored::Colorize;
 use serde::{Deserialize, Serialize};
-use chrono::{DateTime, Duration, NaiveDateTime, Timelike, Utc, serde::ts_seconds};
+use chrono::{DateTime, Duration, TimeZone, Timelike, Utc, serde::ts_seconds};
 
 use crate::format;
 
@@ -82,7 +82,7 @@ impl Entry {
     pub fn new() -> Entry {
         Entry {
             from: Utc::now().with_nanosecond(0).unwrap(),
-            to: DateTime::<Utc>::from_utc(NaiveDateTime::from_timestamp(0, 0).with_nanosecond(0).unwrap(), Utc),
+            to: Utc.timestamp(0, 0),
             activity: String::new(),
             project: String::new(),
             tags: Vec::new(),

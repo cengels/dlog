@@ -1,5 +1,5 @@
 use std::path::PathBuf;
-use chrono::{DateTime, Duration, NaiveDate, Utc};
+use chrono::{DateTime, Duration, TimeZone, Utc};
 use proptest::{collection::vec, prelude::*};
 use crate::entries::{self, Entry};
 
@@ -19,7 +19,7 @@ prop_compose! {
         minute in 0..59u32,
         second in 0..59u32
     ) -> DateTime<Utc> {
-        DateTime::<Utc>::from_utc(NaiveDate::from_yo(year, day).and_hms(hour, minute, second), Utc)
+        Utc.yo(year, day).and_hms(hour, minute, second)
     }
 }
 
