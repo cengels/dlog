@@ -47,7 +47,9 @@ impl Subcommand for Fill {
         entries::rewrite(&entries)?;
 
         if self.update {
-            println!("Updated entry {} {}.", &new_entry, format!("[+{}]", format::duration(&(new_entry.to - last.to)).clear()).bright_magenta());
+            let duration = new_entry.to - last.to;
+            let sign = if duration.num_seconds().is_negative() { "" } else { "+" };
+            println!("Updated entry {} {}.", &new_entry, format!("[{}{}]", sign, format::duration(&duration).clear()).bright_magenta());
         } else {
             println!("Filled entry {}.", &new_entry);
         }

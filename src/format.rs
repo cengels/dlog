@@ -50,11 +50,12 @@ pub fn datetime(datetime: &DateTime<Utc>) -> ColoredString {
 
 pub fn duration(duration: &Duration) -> ColoredString {
     let days = duration.num_days();
+    let sign = if duration.num_seconds().is_negative() { "-" } else { "" };
 
-    let string = if days > 0 {
-        format!("{:0>2}d {:0>2}h {:0>2}m {:0>2}s", days, duration.num_hours() % 24, duration.num_minutes() % 60, duration.num_seconds() % 60)
+    let string = if days != 0 {
+        format!("{}{:0>2}d {:0>2}h {:0>2}m {:0>2}s", sign, days.abs(), duration.num_hours().abs() % 24, duration.num_minutes().abs() % 60, duration.num_seconds().abs() % 60)
     } else {
-        format!("{:0>2}h {:0>2}m {:0>2}s", duration.num_hours() % 24, duration.num_minutes() % 60, duration.num_seconds() % 60)
+        format!("{}{:0>2}h {:0>2}m {:0>2}s", sign, duration.num_hours().abs() % 24, duration.num_minutes().abs() % 60, duration.num_seconds().abs() % 60)
     };
 
     string.bright_magenta()
