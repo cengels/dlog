@@ -15,6 +15,8 @@ if you wish to upgrade.
 - **Fixed**: `dlog summary` not converting to UTC time correctly when using the flags
   `-d`, `-w`, `-y`, and `-a`.
   ([commit](https://github.com/cengels/dlog/commit/41ce60ab9a82d55e26492181c5fd2256e89ab72d))
+- **Fixed**: comment filter not working for `dlog summary -c <comment>`
+  ([commit](https://github.com/cengels/dlog/commit/28892b96a36915e9b6cc79799469b44b0da49260))
 
 ## [0.1.0](https://github.com/cengels/dlog/releases/tag/v0.1.0) - 2020-12-18
 
