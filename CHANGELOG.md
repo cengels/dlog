@@ -5,7 +5,7 @@ be breaking changes. Before 1.0.0, these changes will **not be announced** and
 will only be documented in this file, so please make sure to read it thoroughly
 if you wish to upgrade.
 
-## [Upcoming](https://github.com/cengels/dlog/compare/v0.1.0...HEAD)
+## [0.1.1](https://github.com/cengels/dlog/compare/v0.1.0...v0.1.1) - 2021-01-14
 
 - **Added**: identical entries during `dlog fill` now automatically merge
   with each other as if `dlog fill -u` were called
@@ -17,6 +17,8 @@ if you wish to upgrade.
   ([commit](https://github.com/cengels/dlog/commit/41ce60ab9a82d55e26492181c5fd2256e89ab72d))
 - **Fixed**: comment filter not working for `dlog summary -c <comment>`
   ([commit](https://github.com/cengels/dlog/commit/28892b96a36915e9b6cc79799469b44b0da49260))
+- **Fixed**: `dlog start` followed by `dlog fill` no longer causes an error
+  ([commit](https://github.com/cengels/dlog/commit/af16dd2385a507c520dc88a4366c3c9a8b8278c6))
 
 ## [0.1.0](https://github.com/cengels/dlog/releases/tag/v0.1.0) - 2020-12-18
 
