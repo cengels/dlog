@@ -37,7 +37,7 @@ impl Subcommand for Fill {
         let mut entries = entries::read_all()?;
         let last: Entry = entries.last().ok_or(errors::NoEntryError)?.clone();
         let new_entry = self.parse_entry(&last)?;
-        let should_update = self.update || new_entry.content_equals(&last);
+        let should_update = !last.complete() || self.update || new_entry.content_equals(&last);
 
         if should_update {
             entries.remove(entries.len() - 1);
@@ -65,7 +65,7 @@ impl Fill {
             return Err(clap::Error::with_description(String::from("Only two of the three arguments duration, from, and to can be used."), clap::ErrorKind::ArgumentConflict).into());
         }
 
-        let mut entry: Entry = if self.update { last.clone() } else { Entry::new() };
+        let mut entry: Entry = if self.update || !last.complete() { last.clone() } else { Entry::new() };
         let entry_core = self.activity_project_tags.join(" ").parse::<EntryCore>().unwrap();
         
         if !entry_core.activity.is_empty() {
@@ -94,7 +94,7 @@ impl Fill {
 
         if let Some(from) = self.from {
             entry.from = from;
-        } else if !self.update {
+        } else if !self.update && last.complete() {
             entry.from = if entry.content_equals(last) {
                 last.from
             } else {
@@ -111,6 +111,7 @@ impl Fill {
         }
 
         if !entry.valid() {
+            println!("{}", entry);
             return Err(errors::InvalidEntryError.into());
         }
 
