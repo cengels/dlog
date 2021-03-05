@@ -20,7 +20,7 @@ impl InvalidFormatError {
     pub fn duration(expression: &str) -> InvalidFormatError {
         InvalidFormatError {
             expression: expression.to_owned(),
-            message: String::from("Value must be a valid duration in the format of [WW:][DD:][HH:]MM:SS."),
+            message: String::from("Value must be a valid duration in the format of [WW:][DD:][HH:]MM:SS or a temporal expression in the format of \"[n] [unit(s)]\" where unit is one of: seconds, hours, days, weeks, months, years (or their singular counterpart)."),
             partial_match: false
         }
     }
@@ -44,7 +44,7 @@ impl InvalidFormatError {
     pub fn temporal_expression(expression: &str) -> InvalidFormatError {
         InvalidFormatError {
             expression: expression.to_owned(),
-            message: String::from("Value must be a valid temporal expression in the format of \"in N UNITS\" or \"N UNITS ago\" where UNITS is one of: seconds, hours, days, weeks, months, years (or their singular counterpart)."),
+            message: String::from("Value must be a valid temporal expression in the format of \"in [n] [unit(s)]\" or \"[n] [unit(s)] ago\" where unit is one of: seconds, hours, days, weeks, months, years (or their singular counterpart)."),
             partial_match: false
         }
     }

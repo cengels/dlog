@@ -92,6 +92,16 @@ const DURATION_SEGMENTS: &[i64] = &[
 /// Attempts to parse a duration string into a `Duration`.
 pub fn parse_duration(string: &str) -> Result<Duration, errors::InvalidFormatError> {
     if !string.contains(':') {
+        let fragments: Vec<&str> = string.split(' ').collect();
+
+        if fragments.len() == 2 {
+            if let Ok(number) = fragments[0].parse::<i64>() {
+                if let Some(factor) = get_factor(fragments[1]) {
+                    return Ok(Duration::seconds(number * factor));
+                }
+            }
+        }
+
         return Err(errors::InvalidFormatError::duration(string));
     }
 
