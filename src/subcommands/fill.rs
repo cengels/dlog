@@ -24,6 +24,10 @@ pub struct Fill {
     /// Updates the last entry instead of adding a new one.
     #[clap(short = 'u', long)]
     update: bool,
+    /// Adds a new entry regardless of whether the entry is identical
+    /// to the last one.
+    #[clap(short = 'n', long)]
+    new: bool,
     /// A mandatory activity optionally followed by a project and tags
     /// in the format of <activity>[:<project>] [+<tag>...].
     ///
@@ -37,7 +41,7 @@ impl Subcommand for Fill {
         let mut entries = entries::read_all()?;
         let last: Entry = entries.last().ok_or(errors::NoEntryError)?.clone();
         let new_entry = self.parse_entry(&last)?;
-        let should_update = !last.complete() || self.update || new_entry.content_equals(&last);
+        let should_update = !self.new && (!last.complete() || self.update || new_entry.content_equals(&last));
 
         if should_update {
             entries.remove(entries.len() - 1);
@@ -95,7 +99,7 @@ impl Fill {
         if let Some(from) = self.from {
             entry.from = from;
         } else if !self.update && last.complete() {
-            entry.from = if entry.content_equals(last) {
+            entry.from = if !self.new && entry.content_equals(last) {
                 last.from
             } else {
                 last.to
