@@ -52,7 +52,9 @@ impl Subcommand for Fill {
         entries::rewrite(&entries)?;
 
         if should_update {
-            let duration = if !last.complete() { new_entry.to - last.from } else { new_entry.to - last.to };
+            let duration = new_entry.duration() - last.duration();
+            // When negative, we don't add a sign because format::duration()
+            // already adds one for us.
             let sign = if duration.num_seconds().is_negative() { "" } else { "+" };
             println!("Updated entry {} {}.", &new_entry, format!("[{}{}]", sign, format::duration(&duration).clear()).bright_magenta());
         } else {
