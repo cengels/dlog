@@ -9,12 +9,16 @@ if you wish to upgrade.
 
 - **Added**: option `-d`/`--duration` now accepts a temporal expression similar
   to `-t`/`--to` and `-f`/`--from`
+  ([commit](https://github.com/cengels/dlog/commit/23098625239be06ba563171b45576c656816e940))
 - **Added**: option `-n`/`--new` on `fill` forces dlog to always create a new entry,
   even if the content of the entry is identical to the last entry
+  ([commit](https://github.com/cengels/dlog/commit/976768b6f9c57c2c5916d9a80acebbaf9629cea8))
 - **Fixed**: output for `dlog fill` showed an incorrect added duration when used
   on an incomplete entry created through `dlog start`
+  ([commit](https://github.com/cengels/dlog/commit/5d2a830532b04a8d7bd6e56394ab472503dfa7e0))
 - **Fixed**: *no such file* error when initially running any command while the
   `entries` file has not yet been created
+  ([commit](https://github.com/cengels/dlog/commit/fa2785b8420e69f2bc071d856a086d576d060af6))
 
 ## [0.1.1](https://github.com/cengels/dlog/compare/v0.1.0...v0.1.1) - 2021-01-14
 
