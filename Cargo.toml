@@ -1,6 +1,6 @@
 [package]
 name = "dlog"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["cengels <cengels@tuta.io>"]
 edition = "2018"
 description = "A command line utility to efficiently track where you spend your time."
