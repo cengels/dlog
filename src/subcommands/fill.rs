@@ -38,7 +38,7 @@ pub struct Fill {
 
 impl Subcommand for Fill {
     fn run(&self) -> Result<(), Box<dyn Error>> {
-        let mut entries = entries::read_all()?;
+        let mut entries = entries::read_all().unwrap_or_else(|_| Vec::<Entry>::new());
         let last: Entry = entries.last().ok_or(errors::NoEntryError)?.clone();
         let new_entry = self.parse_entry(&last)?;
         let should_update = !self.new && (!last.complete() || self.update || new_entry.content_equals(&last));

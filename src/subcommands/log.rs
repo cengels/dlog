@@ -30,7 +30,7 @@ pub struct Log {
 
 impl Subcommand for Log {
     fn run(&self) -> Result<(), Box<dyn Error>> {
-        let entries = entries::read_all()?;
+        let entries = entries::read_all().unwrap_or_else(|_| Vec::<Entry>::new());
 
         if entries.is_empty() {
             println!("No entries yet!");

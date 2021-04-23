@@ -1,5 +1,6 @@
 use std::{error::Error, io::Write};
 use clap::Clap;
+use entries::Entry;
 use super::Subcommand;
 use crate::{entries, errors, format};
 
@@ -23,7 +24,7 @@ pub struct Remove {
 
 impl Subcommand for Remove {
     fn run(&self) -> Result<(), Box<dyn Error>> {
-        let mut entries = entries::read_all()?;
+        let mut entries = entries::read_all().unwrap_or_else(|_| Vec::<Entry>::new());
 
         if entries.is_empty() {
             return Err(errors::NoEntryError.into());

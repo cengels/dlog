@@ -77,7 +77,7 @@ impl Statistics {
 
 impl Subcommand for Summary {
     fn run(&self) -> Result<(), Box<dyn Error>> {
-        let entries = entries::read_all()?;
+        let entries = entries::read_all().unwrap_or_else(|_| Vec::<Entry>::new());
 
         if entries.is_empty() {
             println!("No entries yet!");

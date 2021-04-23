@@ -10,7 +10,7 @@ pub struct Start;
 
 impl Subcommand for Start {
     fn run(&self) -> Result<(), Box<dyn Error>> {
-        let mut entries = entries::read_all()?;
+        let mut entries = entries::read_all().unwrap_or_else(|_| Vec::<Entry>::new());
 
         if let Some(last) = entries.last() {
             if !last.complete() {
