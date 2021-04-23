@@ -5,6 +5,17 @@ be breaking changes. Before 1.0.0, these changes will **not be announced** and
 will only be documented in this file, so please make sure to read it thoroughly
 if you wish to upgrade.
 
+## [0.1.2](https://github.com/cengels/dlog/compare/v0.1.1...v0.1.2) - 2021-04-23
+
+- **Added**: option `-d`/`--duration` now accepts a temporal expression similar
+  to `-t`/`--to` and `-f`/`--from`
+- **Added**: option `-n`/`--new` on `fill` forces dlog to always create a new entry,
+  even if the content of the entry is identical to the last entry
+- **Fixed**: output for `dlog fill` showed an incorrect added duration when used
+  on an incomplete entry created through `dlog start`
+- **Fixed**: *no such file* error when initially running any command while the
+  `entries` file has not yet been created
+
 ## [0.1.1](https://github.com/cengels/dlog/compare/v0.1.0...v0.1.1) - 2021-01-14
 
 - **Added**: identical entries during `dlog fill` now automatically merge
