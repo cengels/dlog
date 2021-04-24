@@ -139,7 +139,7 @@ impl Entry {
     /// Gets a colorized string representation of this entry
     /// that can be used as part of a table.
     pub fn tabular(&self) -> String {
-        let duration = format::duration(&self.duration());
+        let duration = format::duration(&self.duration(), &format::TimePeriod::Days);
 
         let activity_project = if self.project.is_empty() {
             self.activity.cyan().to_string()
@@ -177,7 +177,7 @@ const ACTIVITY_LENGTH: usize = 56;
 
 impl Display for Entry {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let duration = format::duration(&self.duration());
+        let duration = format::duration(&self.duration(), &format::TimePeriod::Days);
 
         let activity_project = if self.project.is_empty() {
             self.activity.cyan().to_string()

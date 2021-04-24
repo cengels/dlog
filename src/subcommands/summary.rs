@@ -3,6 +3,7 @@ use chrono::{DateTime, Duration, Local, TimeZone, Timelike, Utc};
 use clap::Clap;
 use colored::Colorize;
 use entries::{Entry, EntryCore};
+use format::TimePeriod;
 use pager::Pager;
 use super::Subcommand;
 use crate::{entries, format, parser::parse_datetime};
@@ -46,6 +47,9 @@ pub struct Summary {
     /// Prints the entries without a pager. Note that this may flood your terminal.
     #[clap(short = 'P', long)]
     no_pager: bool,
+    /// Always displays totaled durations in hours, not days.
+    #[clap(short = 'h', long)]
+    hours: bool,
     /// An activity and optionally project and tags in the format of
     /// `<activity>[:<project>] [+<tag>...]` to filter the entries.
     ///
@@ -226,26 +230,28 @@ impl Summary {
             Pager::new().setup();
         }
 
+        let time_period = if self.hours { TimePeriod::Hours } else { TimePeriod::Days };
+
         println!("Summary of entries between {} and {}:\n", format::datetime(&self.from()), format::datetime(&self.to()));
-        println!("{:w$} {:>dw$}\n", "Total time spent:", format::duration(&statistics.total), w = FIELD_WIDTH, dw = DURATION_WIDTH);
+        println!("{:w$} {:>dw$}\n", "Total time spent:", format::duration(&statistics.total, &time_period), w = FIELD_WIDTH, dw = DURATION_WIDTH);
         println!("Activities:\n");
 
         for activity in sort(&statistics.activities) {
-            println!("{:w$} {:>dw$}", activity.0.cyan(), format::duration(&activity.1), w = FIELD_WIDTH, dw = DURATION_WIDTH);
+            println!("{:w$} {:>dw$}", activity.0.cyan(), format::duration(&activity.1, &time_period), w = FIELD_WIDTH, dw = DURATION_WIDTH);
         }
 
         for activity_project in sort(&statistics.activities_projects) {
             let colon_index = activity_project.0.find(':').unwrap();
             let string = format!("{}:{}", activity_project.0[0..colon_index].cyan(), activity_project.0[colon_index + 1..].bright_red());
             // Due to the ANSI escape code a higher field width is required here.
-            println!("{:w$} {:>dw$}", string, format::duration(&activity_project.1), w = FIELD_WIDTH + 18, dw = DURATION_WIDTH);
+            println!("{:w$} {:>dw$}", string, format::duration(&activity_project.1, &time_period), w = FIELD_WIDTH + 18, dw = DURATION_WIDTH);
         }
 
         if !statistics.projects.is_empty() {
             println!("\nProjects:\n");
 
             for project in sort(&statistics.projects) {
-                println!("{:w$} {:>dw$}", project.0.bright_red(), format::duration(&project.1), w = FIELD_WIDTH, dw = DURATION_WIDTH);
+                println!("{:w$} {:>dw$}", project.0.bright_red(), format::duration(&project.1, &time_period), w = FIELD_WIDTH, dw = DURATION_WIDTH);
             }
         }
 
@@ -253,7 +259,7 @@ impl Summary {
             println!("\nTags:\n");
 
             for tag in sort(&statistics.tags) {
-                println!("{:w$} {:>dw$}", tag.0.bright_yellow(), format::duration(&tag.1), w = FIELD_WIDTH, dw = DURATION_WIDTH);
+                println!("{:w$} {:>dw$}", tag.0.bright_yellow(), format::duration(&tag.1, &time_period), w = FIELD_WIDTH, dw = DURATION_WIDTH);
             }
         }
     }
@@ -280,6 +286,7 @@ mod test {
             comment: None,
             limit: 0,
             no_pager: false,
+            hours: false,
             activity_project_tags: Vec::new()
         }
     }

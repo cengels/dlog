@@ -52,14 +52,29 @@ pub fn datetime(datetime: &DateTime<Utc>) -> ColoredString {
     delayed_format.to_string().magenta()
 }
 
-pub fn duration(duration: &Duration) -> ColoredString {
-    let days = duration.num_days();
+#[derive(PartialEq, PartialOrd)]
+pub enum TimePeriod {
+    Days = 3,
+    Hours = 2,
+    Minutes = 1,
+    Seconds = 0
+}
+
+pub fn duration(duration: &Duration, largest_period: &TimePeriod) -> ColoredString {
+    let days = duration.num_days().abs();
+    let hours = if largest_period == &TimePeriod::Hours { duration.num_hours().abs() } else { duration.num_hours().abs() % 24 };
+    let minutes = if largest_period == &TimePeriod::Minutes { duration.num_minutes().abs() } else { duration.num_minutes().abs() % 60 };
+    let seconds = if largest_period == &TimePeriod::Seconds { duration.num_seconds().abs() } else { duration.num_seconds().abs() % 60 };
     let sign = if duration.num_seconds().is_negative() { "-" } else { "" };
 
-    let string = if days != 0 {
-        format!("{}{:0>2}d {:0>2}h {:0>2}m {:0>2}s", sign, days.abs(), duration.num_hours().abs() % 24, duration.num_minutes().abs() % 60, duration.num_seconds().abs() % 60)
+    let string = if days != 0 && largest_period >= &TimePeriod::Days {
+        format!("{}{:0>2}d {:0>2}h {:0>2}m {:0>2}s", sign, days, hours, minutes, seconds)
+    } else if hours != 0 && largest_period >= &TimePeriod::Hours {
+        format!("{}{:0>2}h {:0>2}m {:0>2}s", sign, hours, minutes, seconds)
+    } else if minutes != 0 && largest_period >= &TimePeriod::Minutes {
+        format!("{}{:0>2}m {:0>2}s", sign, minutes, seconds)
     } else {
-        format!("{}{:0>2}h {:0>2}m {:0>2}s", sign, duration.num_hours().abs() % 24, duration.num_minutes().abs() % 60, duration.num_seconds().abs() % 60)
+        format!("{}{:0>2}s", sign, seconds)
     };
 
     string.bright_magenta()

@@ -56,7 +56,7 @@ impl Subcommand for Fill {
             // When negative, we don't add a sign because format::duration()
             // already adds one for us.
             let sign = if duration.num_seconds().is_negative() { "" } else { "+" };
-            println!("Updated entry {} {}.", &new_entry, format!("[{}{}]", sign, format::duration(&duration).clear()).bright_magenta());
+            println!("Updated entry {} {}.", &new_entry, format!("[{}{}]", sign, format::duration(&duration, &format::TimePeriod::Days).clear()).bright_magenta());
         } else {
             println!("Filled entry {}.", &new_entry);
         }

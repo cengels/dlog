@@ -5,6 +5,15 @@ be breaking changes. Before 1.0.0, these changes will **not be announced** and
 will only be documented in this file, so please make sure to read it thoroughly
 if you wish to upgrade.
 
+## Upcoming
+
+- **Added**: option `dlog summary -h`/`--hours` that will hide the day component
+  of a duration (e.g. `05d 12h 00m 00s` becomes `132h 00m 00s` if `-h` is
+  specified)
+- **Changed**: durations printed by `dlog summary` no longer show the minute
+  component if the duration is < 1 minute (e.g. `00m 50s` becomes `50s` but
+  `12h 00m 05s` stays as-is)
+
 ## [0.1.2](https://github.com/cengels/dlog/compare/v0.1.1...v0.1.2) - 2021-04-23
 
 - **Added**: option `-d`/`--duration` now accepts a temporal expression similar
