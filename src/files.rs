@@ -7,12 +7,8 @@ fn base_path() -> Result<PathBuf, std::io::Error> {
         return Ok(PathBuf::from(path));
     }
 
-    let base: Result<PathBuf, std::io::Error> =
-        if let Some(data_dir) = dirs::data_dir() {
-            Ok(data_dir)
-        } else {
-            Err(std::io::Error::new(ErrorKind::NotFound, "Could not locate appropriate dlog directory. This is most likely not your fault. To fix this problem, try defining the path dlog should use to store your entries explicitly in the environment variable DLOG_PATH."))
-        };
+    let base: Result<PathBuf, std::io::Error> = dirs::data_dir()
+        .ok_or_else(|| std::io::Error::new(ErrorKind::NotFound, "Could not locate appropriate dlog directory. This is most likely not your fault. To fix this problem, try defining the path dlog should use to store your entries explicitly in the environment variable DLOG_PATH."));
 
     let mut path = base?;
 

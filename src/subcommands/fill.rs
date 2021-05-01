@@ -92,11 +92,7 @@ impl Fill {
             entry.comment = message.to_owned();
         }
 
-        entry.to = if let Some(to) = self.to {
-            to
-        } else {
-            Utc::now().with_nanosecond(0).unwrap()
-        };
+        entry.to = self.to.or_else(|| Utc::now().with_nanosecond(0)).unwrap();
 
         if let Some(from) = self.from {
             entry.from = from;

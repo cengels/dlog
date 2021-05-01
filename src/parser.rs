@@ -8,12 +8,13 @@ pub fn parse_datetime(string: &str) -> Result<DateTime<Utc>, errors::InvalidForm
 
     DateTime::parse_from_rfc2822(&trimmed)
         .or_else(|_| DateTime::parse_from_rfc3339(&trimmed))
-        .map_err(|_| ())
-        .and_then(|x| { x.with_nanosecond(0).ok_or(()) })
+        .ok()
+        .and_then(|x| { x.with_nanosecond(0) })
         .map(|x| { x.with_timezone(&Local) })
-        .or_else(|_| Local.datetime_from_str(&trimmed, "%Y-%m-%d %H:%M:%S"))
-        .or_else(|_| NaiveTime::parse_from_str(&trimmed, "%H:%M:%S").map_err(|_| ()).and_then(|x| { Local::today().and_time(x).ok_or(()) }))
+        .or_else(|| Local.datetime_from_str(&trimmed, "%Y-%m-%d %H:%M:%S").ok())
+        .or_else(|| NaiveTime::parse_from_str(&trimmed, "%H:%M:%S").ok().and_then(|x| { Local::today().and_time(x) }))
         .map(|x| { x.with_timezone(&Utc)})
+        .ok_or(())
         .or_else(|_| parse_temporal_expression(&trimmed))
         .map_err(|e| {
             if e.partial_match { e } else {
@@ -28,10 +29,10 @@ fn get_factor(s: &str) -> Option<i64> {
         "seconds" | "second" => Some(1),
         "minutes" | "minute" => Some(60),
         "hours" | "hour" => Some(3600),
-        "days" | "day" => Some(86400),
-        "weeks" | "week" => Some(604800),
-        "months" | "month" => Some(2592000),
-        "years" | "year" => Some(31536000),
+        "days" | "day" => Some(86_400),
+        "weeks" | "week" => Some(604_800),
+        "months" | "month" => Some(2_592_000),
+        "years" | "year" => Some(31_536_000),
         _ => None
     }
 }

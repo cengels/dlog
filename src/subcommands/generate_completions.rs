@@ -1,6 +1,6 @@
 use std::{error::Error, io};
 use clap::{Clap, IntoApp};
-use clap_generate::{generate, generators::*};
+use clap_generate::{generate, generators::{Bash, Elvish, Fish, PowerShell, Zsh}};
 use super::{Subcommand, Subcommands};
 
 /// Generates auto-completions for a given shell.

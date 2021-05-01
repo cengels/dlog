@@ -86,7 +86,7 @@ impl Subcommand for Log {
 impl Log {
     fn print_entries_for_day(&self, entries: &[&Entry]) {
         if let Some(first) = entries.first() {
-            println!("{}\n", format::date(&first.from.date()));
+            println!("{}\n", format::date(first.from.date()));
 
             for entry in entries.iter().rev() {
                 println!("    {}", entry.tabular());

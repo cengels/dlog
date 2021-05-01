@@ -17,40 +17,40 @@ impl std::error::Error for InvalidFormatError {}
 const MAX_FORMAT_WIDTH: usize = 38;
 
 impl InvalidFormatError {
-    pub fn duration(expression: &str) -> InvalidFormatError {
-        InvalidFormatError {
+    pub fn duration(expression: &str) -> Self {
+        Self {
             expression: expression.to_owned(),
             message: String::from("Value must be a valid duration in the format of [WW:][DD:][HH:]MM:SS or a temporal expression in the format of \"[n] [unit(s)]\" where unit is one of: seconds, hours, days, weeks, months, years (or their singular counterpart)."),
             partial_match: false
         }
     }
 
-    pub fn invalid_number_with_bounds(number: &str, bounds: i64) -> InvalidFormatError {
-        InvalidFormatError {
+    pub fn invalid_number_with_bounds(number: &str, bounds: i64) -> Self {
+        Self {
             expression: number.to_owned(),
             message: format!("Value must be a valid positive number under {}.", bounds),
             partial_match: true
         }
     }
 
-    pub fn invalid_number(number: &str) -> InvalidFormatError {
-        InvalidFormatError {
+    pub fn invalid_number(number: &str) -> Self {
+        Self {
             expression: number.to_owned(),
             message: String::from("Value must be a valid positive number."),
             partial_match: true
         }
     }
 
-    pub fn temporal_expression(expression: &str) -> InvalidFormatError {
-        InvalidFormatError {
+    pub fn temporal_expression(expression: &str) -> Self {
+        Self {
             expression: expression.to_owned(),
             message: String::from("Value must be a valid temporal expression in the format of \"in [n] [unit(s)]\" or \"[n] [unit(s)] ago\" where unit is one of: seconds, hours, days, weeks, months, years (or their singular counterpart)."),
             partial_match: false
         }
     }
 
-    pub fn datetime(expression: &str) -> InvalidFormatError {
-        InvalidFormatError {
+    pub fn datetime(expression: &str) -> Self {
+        Self {
             expression: expression.to_owned(),
             message: format!("Valid formats include:\n{:>w$} ({})\n{:>w$} ({})\n{:>w$} ({})\n{:>w$} ({})\n{:>w$}\n{:>w$}",
                 "Thu, 16 Jul 2020 16:05:32 +0100", "RFC 2822",

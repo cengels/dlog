@@ -33,7 +33,7 @@ impl FromStr for EntryCore {
                 activity = &s[0..plus_index];
             }
 
-            return Ok(EntryCore {
+            return Ok(Self {
                 activity: activity.trim().to_owned(),
                 project: project.trim().to_owned(),
                 tags: s[plus_index + 1..].split('+').map(|tag| tag.trim().to_owned()).filter(|tag| !tag.is_empty()).collect()
@@ -46,7 +46,7 @@ impl FromStr for EntryCore {
             activity = &s[0..];
         }
 
-        Ok(EntryCore {
+        Ok(Self {
             activity: activity.trim().to_owned(),
             project: project.trim().to_owned(),
             tags: Vec::new()
@@ -79,8 +79,8 @@ pub struct Entry {
 impl Entry {
     /// Creates a new incomplete time entry.
     /// Incomplete time entries only have a start point.
-    pub fn new() -> Entry {
-        Entry {
+    pub fn new() -> Self {
+        Self {
             from: Utc::now().with_nanosecond(0).unwrap(),
             to: Utc.timestamp(0, 0),
             activity: String::new(),
@@ -110,7 +110,7 @@ impl Entry {
 
     /// Returns true if the textual contents of the two entries
     /// (i.e. excluding the start and end times) are the same.
-    pub fn content_equals(&self, other: &Entry) -> bool {
+    pub fn content_equals(&self, other: &Self) -> bool {
         self.activity == other.activity
          && self.project == other.project
          && self.tags == other.tags
@@ -153,18 +153,18 @@ impl Entry {
             format!("[{}]", self.tags.iter().map(|tag| tag.bright_yellow().to_string()).collect::<Vec<String>>().join(", "))
         };
 
-        let activity_length = if !self.project.is_empty() {
-            ACTIVITY_LENGTH
-        } else {
+        let activity_length = if self.project.is_empty() {
             // We have to subtract exactly 9 here for the output
             // to be properly aligned with rows that have empty projects.
             // There is probably a good reason why, but I don't know what it is.
             ACTIVITY_LENGTH - 9
+        } else {
+            ACTIVITY_LENGTH
         };
 
         format!("{} to {} {} {:>width$}  {}",
             format::time(&self.from),
-            if self.from.date() != self.to.date() { format::datetime_short(&self.to) } else { format::time(&self.to) },
+            if self.from.date() == self.to.date() { format::time(&self.to) } else { format::datetime_short(&self.to) },
             format!("({})", duration),
             activity_project,
             tags,
@@ -195,7 +195,7 @@ impl Display for Entry {
             activity_project,
             tags,
             format::time(&self.from),
-            if self.from.date() != self.to.date() { format::datetime_short(&self.to) } else { format::time(&self.to) },
+            if self.from.date() == self.to.date() { format::time(&self.to) } else { format::datetime_short(&self.to) },
             format!("({})", duration)
         ))
     }
@@ -218,7 +218,7 @@ mod vector_format {
         if s.is_empty() {
             Ok(Vec::<String>::new())
         } else {
-            Ok(s.split(',').map(|s| s.to_owned()).collect::<Vec<String>>())
+            Ok(s.split(',').map(ToOwned::to_owned).collect::<Vec<String>>())
         }
     }
 }

@@ -68,8 +68,8 @@ struct Statistics {
 }
 
 impl Statistics {
-    pub fn new() -> Statistics {
-        Statistics {
+    pub fn new() -> Self {
+        Self {
             total: Duration::seconds(0),
             activities: HashMap::new(),
             activities_projects: HashMap::new(),
@@ -115,7 +115,7 @@ fn set(map: &mut HashMap<String, Duration>, key: String, duration: &Duration) {
 
 fn sort(map: &HashMap<String, Duration>) -> IntoIter<(&std::string::String, &chrono::Duration)> {
     let mut vector = map.iter().collect::<Vec<(&String, &Duration)>>();
-    vector.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(Ordering::Equal));
+    vector.sort_by(|a, b| b.1.partial_cmp(a.1).unwrap_or(Ordering::Equal));
 
     vector.into_iter()
 }
@@ -172,7 +172,7 @@ impl Summary {
         }
 
         for tag in &entry_core.tags {
-            if !entry.tags.contains(&tag) {
+            if !entry.tags.contains(tag) {
                 return true;
             }
         }
@@ -237,21 +237,21 @@ impl Summary {
         println!("Activities:\n");
 
         for activity in sort(&statistics.activities) {
-            println!("{:w$} {:>dw$}", activity.0.cyan(), format::duration(&activity.1, &time_period), w = FIELD_WIDTH, dw = DURATION_WIDTH);
+            println!("{:w$} {:>dw$}", activity.0.cyan(), format::duration(activity.1, &time_period), w = FIELD_WIDTH, dw = DURATION_WIDTH);
         }
 
         for activity_project in sort(&statistics.activities_projects) {
             let colon_index = activity_project.0.find(':').unwrap();
             let string = format!("{}:{}", activity_project.0[0..colon_index].cyan(), activity_project.0[colon_index + 1..].bright_red());
             // Due to the ANSI escape code a higher field width is required here.
-            println!("{:w$} {:>dw$}", string, format::duration(&activity_project.1, &time_period), w = FIELD_WIDTH + 18, dw = DURATION_WIDTH);
+            println!("{:w$} {:>dw$}", string, format::duration(activity_project.1, &time_period), w = FIELD_WIDTH + 18, dw = DURATION_WIDTH);
         }
 
         if !statistics.projects.is_empty() {
             println!("\nProjects:\n");
 
             for project in sort(&statistics.projects) {
-                println!("{:w$} {:>dw$}", project.0.bright_red(), format::duration(&project.1, &time_period), w = FIELD_WIDTH, dw = DURATION_WIDTH);
+                println!("{:w$} {:>dw$}", project.0.bright_red(), format::duration(project.1, &time_period), w = FIELD_WIDTH, dw = DURATION_WIDTH);
             }
         }
 
@@ -259,7 +259,7 @@ impl Summary {
             println!("\nTags:\n");
 
             for tag in sort(&statistics.tags) {
-                println!("{:w$} {:>dw$}", tag.0.bright_yellow(), format::duration(&tag.1, &time_period), w = FIELD_WIDTH, dw = DURATION_WIDTH);
+                println!("{:w$} {:>dw$}", tag.0.bright_yellow(), format::duration(tag.1, &time_period), w = FIELD_WIDTH, dw = DURATION_WIDTH);
             }
         }
     }

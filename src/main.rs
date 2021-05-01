@@ -1,5 +1,11 @@
 #![allow(dead_code)]
-#![allow(clippy::module_inception)]
+#![warn(clippy::all, clippy::pedantic, clippy::nursery, clippy::cargo)]
+#![allow(clippy::module_inception,  // incorrectly barks on declaring mod subcommands in mod.rs
+    clippy::struct_excessive_bools,  // necessary due to Clap
+    clippy::module_name_repetitions,  // when imported unprefixed, this would cause potential confusion
+    clippy::map_err_ignore,  // ignoring errors is perfectly acceptable when there is an alternative course of action (see parser.rs)
+    clippy::wildcard_imports,  // necessary for mod.rs files
+    clippy::multiple_crate_versions)]  // unfixable as those crates are transitive dependencies
 
 use clap::Clap;
 use colored::*;

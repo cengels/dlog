@@ -18,7 +18,7 @@ pub fn datetime_short(date: &DateTime<Utc>) -> ColoredString {
     date.with_timezone(&Local).format(FORMAT_DATETIME_SHORT).to_string().magenta()
 }
 
-pub fn date(date: &Date<Utc>) -> ColoredString {
+pub fn date(date: Date<Utc>) -> ColoredString {
     let today = Local::today();
     let date = date.with_timezone(&Local);
 
