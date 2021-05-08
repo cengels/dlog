@@ -139,7 +139,7 @@ impl Entry {
     /// Gets a colorized string representation of this entry
     /// that can be used as part of a table.
     pub fn tabular(&self) -> String {
-        let duration = format::duration(&self.duration(), &format::TimePeriod::Days);
+        let duration = format::duration_full(&self.duration(), &format::TimePeriod::Hours);
 
         let activity_project = if self.project.is_empty() {
             self.activity.cyan().to_string()

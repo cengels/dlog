@@ -60,18 +60,35 @@ pub enum TimePeriod {
     Seconds = 0
 }
 
+/// Formats the duration into a ColoredString.
+/// largest_period defines the last displayed duration unit.
+/// For instance, if largest_period is `Hours` and the duration
+/// encompasses 3 days, the string will be "72h 00m 00s".
 pub fn duration(duration: &Duration, largest_period: &TimePeriod) -> ColoredString {
+    base_duration(&duration, &largest_period, false)
+}
+
+/// Formats the duration into a ColoredString.
+/// largest_period defines the last displayed duration unit,
+/// regardless of whether or not it is empty. For instance,
+/// if largest_period is `Hours` and the duration encompasses
+/// only 27 minutes, the string will still be "00h 27m 00s".
+pub fn duration_full(duration: &Duration, largest_period: &TimePeriod) -> ColoredString {
+    base_duration(&duration, &largest_period, true)
+}
+
+fn base_duration(duration: &Duration, largest_period: &TimePeriod, print_empty: bool) -> ColoredString {
     let days = duration.num_days().abs();
     let hours = if largest_period == &TimePeriod::Hours { duration.num_hours().abs() } else { duration.num_hours().abs() % 24 };
     let minutes = if largest_period == &TimePeriod::Minutes { duration.num_minutes().abs() } else { duration.num_minutes().abs() % 60 };
     let seconds = if largest_period == &TimePeriod::Seconds { duration.num_seconds().abs() } else { duration.num_seconds().abs() % 60 };
     let sign = if duration.num_seconds().is_negative() { "-" } else { "" };
 
-    let string = if days != 0 && largest_period >= &TimePeriod::Days {
+    let string = if (days != 0 || print_empty) && largest_period >= &TimePeriod::Days {
         format!("{}{:0>2}d {:0>2}h {:0>2}m {:0>2}s", sign, days, hours, minutes, seconds)
-    } else if hours != 0 && largest_period >= &TimePeriod::Hours {
+    } else if (hours != 0 || print_empty) && largest_period >= &TimePeriod::Hours {
         format!("{}{:0>2}h {:0>2}m {:0>2}s", sign, hours, minutes, seconds)
-    } else if minutes != 0 && largest_period >= &TimePeriod::Minutes {
+    } else if (minutes != 0 || print_empty) && largest_period >= &TimePeriod::Minutes {
         format!("{}{:0>2}m {:0>2}s", sign, minutes, seconds)
     } else {
         format!("{}{:0>2}s", sign, seconds)
