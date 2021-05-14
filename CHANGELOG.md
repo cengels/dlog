@@ -7,6 +7,8 @@ if you wish to upgrade.
 
 ## Upcoming
 
+- **Added**: subcommand `dlog count` with the same syntax as `dlog summary` but
+  printing total entry counts rather than summed up entry durations
 - **Added**: option `dlog summary -h`/`--hours` that will hide the day component
   of a duration (e.g. `05d 12h 00m 00s` becomes `132h 00m 00s` if `-h` is
   specified)

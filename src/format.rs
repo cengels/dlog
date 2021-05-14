@@ -96,3 +96,8 @@ fn base_duration(duration: &Duration, largest_period: &TimePeriod, print_empty: 
 
     string.bright_magenta()
 }
+
+/// Formats the u32 into a count string suffixed with "entries".
+pub fn count(count: &u32) -> ColoredString {
+    format!("{} entries", &count).bright_magenta()
+}
