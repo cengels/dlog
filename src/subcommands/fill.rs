@@ -4,7 +4,7 @@ use clap::Clap;
 use colored::Colorize;
 use entries::Entry;
 use super::Subcommand;
-use crate::{entries::{self, EntryCore}, errors, format, parser::parse_datetime, parser::parse_duration};
+use crate::{entries::{self, EntryCore}, errors, format, input::parse_datetime, input::parse_duration};
 
 /// Fills the time between the last time entry and now with a new time entry.
 #[derive(Clap, Debug)]

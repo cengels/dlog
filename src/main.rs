@@ -16,7 +16,7 @@ mod entries;
 mod files;
 mod errors;
 mod format;
-mod parser;
+mod input;
 
 #[cfg(test)]
 mod test;

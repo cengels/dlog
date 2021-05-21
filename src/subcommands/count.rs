@@ -5,7 +5,7 @@ use colored::Colorize;
 use entries::{Entry, EntryCore};
 use pager::Pager;
 use super::Subcommand;
-use crate::{entries, format, parser::parse_datetime};
+use crate::{entries, format, input::parse_datetime};
 
 const DURATION_WIDTH: usize = 30;
 const FIELD_WIDTH: usize = 50;

@@ -5,7 +5,7 @@ use colored::Colorize;
 use entries::Entry;
 use pager::Pager;
 use super::Subcommand;
-use crate::{entries, format, parser::parse_datetime};
+use crate::{entries, format, input::parse_datetime};
 
 /// Prints a log of the last n (or all if -l is not specified) entries.
 #[derive(Clap, Debug)]
