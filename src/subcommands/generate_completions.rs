@@ -15,11 +15,11 @@ impl Subcommand for GenerateCompletions {
         let mut app = Subcommands::into_app();
 
         match self.shell.as_str() {
-            "bash" => generate::<Bash, _>(&mut app, "completions", &mut io::stdout()),
-            "zsh" => generate::<Zsh, _>(&mut app, "completions", &mut io::stdout()),
-            "fish" => generate::<Fish, _>(&mut app, "completions", &mut io::stdout()),
-            "powershell" => generate::<PowerShell, _>(&mut app, "completions", &mut io::stdout()),
-            "elvish" => generate::<Elvish, _>(&mut app, "completions", &mut io::stdout()),
+            "bash" => generate::<Bash, _>(&mut app, "dlog", &mut io::stdout()),
+            "zsh" => generate::<Zsh, _>(&mut app, "dlog", &mut io::stdout()),
+            "fish" => generate::<Fish, _>(&mut app, "dlog", &mut io::stdout()),
+            "powershell" => generate::<PowerShell, _>(&mut app, "dlog", &mut io::stdout()),
+            "elvish" => generate::<Elvish, _>(&mut app, "dlog", &mut io::stdout()),
             _ => return Err(clap::Error::with_description(String::from("Invalid value."), clap::ErrorKind::InvalidValue).into())
         }
 
