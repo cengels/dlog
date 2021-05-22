@@ -1,15 +1,11 @@
-use std::{cmp::Ordering, collections::HashMap, error::Error, vec::IntoIter};
+use std::{collections::HashMap, error::Error};
 use chrono::{DateTime, Duration, Local, TimeZone, Timelike, Utc};
 use clap::Clap;
-use colored::Colorize;
 use entries::{Entry, EntryCore};
 use format::TimePeriod;
 use pager::Pager;
 use super::Subcommand;
-use crate::{entries, format, input::parse_datetime};
-
-const DURATION_WIDTH: usize = 30;
-const FIELD_WIDTH: usize = 50;
+use crate::{data::{DURATION_WIDTH, FIELD_WIDTH, Statistics}, entries, format, input::parse_datetime};
 
 /// Finds the total time spent on certain activities or projects within a given time frame.
 /// You can specify multiple filters to further narrow down the result.
@@ -58,27 +54,6 @@ pub struct Summary {
     activity_project_tags: Vec<String>
 }
 
-#[derive(Debug, PartialEq)]
-struct Statistics {
-    total: Duration,
-    activities: HashMap<String, Duration>,
-    activities_projects: HashMap<String, Duration>,
-    projects: HashMap<String, Duration>,
-    tags: HashMap<String, Duration>
-}
-
-impl Statistics {
-    pub fn new() -> Self {
-        Self {
-            total: Duration::seconds(0),
-            activities: HashMap::new(),
-            activities_projects: HashMap::new(),
-            projects: HashMap::new(),
-            tags: HashMap::new()
-        }
-    }
-}
-
 impl Subcommand for Summary {
     fn run(&self) -> Result<(), Box<dyn Error>> {
         let entries = entries::read_all().unwrap_or_else(|_| Vec::<Entry>::new());
@@ -99,7 +74,7 @@ impl Subcommand for Summary {
     }
 }
 
-fn set(map: &mut HashMap<String, Duration>, key: String, duration: &Duration) {
+fn add_duration(map: &mut HashMap<String, Duration>, key: String, duration: &Duration) {
     if key.is_empty() {
         return;
     }
@@ -113,12 +88,6 @@ fn set(map: &mut HashMap<String, Duration>, key: String, duration: &Duration) {
     }
 }
 
-fn sort(map: &HashMap<String, Duration>) -> IntoIter<(&std::string::String, &chrono::Duration)> {
-    let mut vector = map.iter().collect::<Vec<(&String, &Duration)>>();
-    vector.sort_by(|a, b| b.1.partial_cmp(a.1).unwrap_or(Ordering::Equal));
-
-    vector.into_iter()
-}
 
 impl Summary {
     fn from(&self) -> DateTime<Utc> {
@@ -147,45 +116,12 @@ impl Summary {
         self.to.unwrap_or_else(|| Utc::now().with_nanosecond(0).unwrap())
     }
 
-    fn is_filtered(&self, entry: &Entry, entry_core: &EntryCore) -> bool {
-        if let Some(string) = &self.string {
-            if !entry.activity.contains(string)
-             && !entry.project.contains(string)
-             && !entry.comment.contains(string)
-             && !entry.tags.iter().any(|tag| tag.contains(string)) {
-                return true;
-            }
-        }
-
-        if !entry_core.activity.is_empty() && entry.activity != entry_core.activity {
-            return true;
-        }
-
-        if !entry_core.project.is_empty() && entry.project != entry_core.project {
-            return true;
-        }
-
-        if let Some(comment) = &self.comment {
-            if !entry.comment.contains(comment) {
-                return true;
-            }
-        }
-
-        for tag in &entry_core.tags {
-            if !entry.tags.contains(tag) {
-                return true;
-            }
-        }
-
-        false
-    }
-
-    fn collect_statistics(&self, entries: &[Entry]) -> Statistics {
+    fn collect_statistics(&self, entries: &[Entry]) -> Statistics<Duration> {
         let entry_core = self.activity_project_tags.join(" ").parse::<EntryCore>().unwrap();
         let to = self.to();
         let from = self.from();
 
-        let mut stats = Statistics::new();
+        let mut stats = Statistics::<Duration>::new();
         let mut counter = 0;
 
         for entry in entries.iter().rev() {
@@ -193,7 +129,7 @@ impl Summary {
                 break;
             }
 
-            if !entry.complete() || !entry.valid() || to < entry.from || self.is_filtered(entry, &entry_core) {
+            if !entry.complete() || !entry.valid() || to < entry.from || entry.is_filtered(&entry_core, &self.string, &self.comment) {
                 continue;
             }
 
@@ -203,16 +139,16 @@ impl Summary {
                 stats.total = result;
             }
             
-            set(&mut stats.activities, entry.activity.to_owned(), &duration);
+            add_duration(&mut stats.activities, entry.activity.to_owned(), &duration);
 
             if !entry.project.is_empty() {
-                set(&mut stats.activities_projects, format!("{}:{}", entry.activity, entry.project), &duration);
+                add_duration(&mut stats.activities_projects, format!("{}:{}", entry.activity, entry.project), &duration);
             }
 
-            set(&mut stats.projects, entry.project.to_owned(), &duration);
+            add_duration(&mut stats.projects, entry.project.to_owned(), &duration);
 
             for tag in &entry.tags {
-                set(&mut stats.tags, tag.to_owned(), &duration);
+                add_duration(&mut stats.tags, tag.to_owned(), &duration);
             }
 
             counter += 1;
@@ -225,7 +161,7 @@ impl Summary {
         stats
     }
 
-    fn print_results(&self, statistics: &Statistics) {
+    fn print_results(&self, statistics: &Statistics<Duration>) {
         if !self.no_pager {
             Pager::new().setup();
         }
@@ -234,34 +170,8 @@ impl Summary {
 
         println!("Summary of entries between {} and {}:\n", format::datetime(&self.from()), format::datetime(&self.to()));
         println!("{:w$} {:>dw$}\n", "Total time spent:", format::duration(&statistics.total, &time_period), w = FIELD_WIDTH, dw = DURATION_WIDTH);
-        println!("Activities:\n");
 
-        for activity in sort(&statistics.activities) {
-            println!("{:w$} {:>dw$}", activity.0.cyan(), format::duration(activity.1, &time_period), w = FIELD_WIDTH, dw = DURATION_WIDTH);
-        }
-
-        for activity_project in sort(&statistics.activities_projects) {
-            let colon_index = activity_project.0.find(':').unwrap();
-            let string = format!("{}:{}", activity_project.0[0..colon_index].cyan(), activity_project.0[colon_index + 1..].bright_red());
-            // Due to the ANSI escape code a higher field width is required here.
-            println!("{:w$} {:>dw$}", string, format::duration(activity_project.1, &time_period), w = FIELD_WIDTH + 18, dw = DURATION_WIDTH);
-        }
-
-        if !statistics.projects.is_empty() {
-            println!("\nProjects:\n");
-
-            for project in sort(&statistics.projects) {
-                println!("{:w$} {:>dw$}", project.0.bright_red(), format::duration(project.1, &time_period), w = FIELD_WIDTH, dw = DURATION_WIDTH);
-            }
-        }
-
-        if !statistics.tags.is_empty() {
-            println!("\nTags:\n");
-
-            for tag in sort(&statistics.tags) {
-                println!("{:w$} {:>dw$}", tag.0.bright_yellow(), format::duration(tag.1, &time_period), w = FIELD_WIDTH, dw = DURATION_WIDTH);
-            }
-        }
+        statistics.print(|duration| format::duration(duration, &time_period));
     }
 }
 
@@ -270,8 +180,8 @@ impl Summary {
 mod test {
     use std::collections::HashMap;
     use chrono::{Duration, TimeZone, Utc};
-    use crate::test;
-    use super::{Statistics, Summary};
+    use crate::{data::Statistics, test};
+    use super::Summary;
 
     fn new_summary() -> Summary {
         Summary {
@@ -291,7 +201,7 @@ mod test {
         }
     }
 
-    fn stats_for(timestamp: i64, days: i64) -> Statistics {
+    fn stats_for(timestamp: i64, days: i64) -> Statistics<Duration> {
         let mut summary = new_summary();
         summary.to = Some(Utc.timestamp(timestamp, 0));
         summary.from = Some(summary.to.unwrap() - Duration::days(days));

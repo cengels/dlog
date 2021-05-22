@@ -11,6 +11,7 @@ use clap::Clap;
 use colored::*;
 use subcommands::Subcommand;
 
+mod data;
 mod subcommands;
 mod entries;
 mod files;

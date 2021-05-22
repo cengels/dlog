@@ -136,6 +136,39 @@ impl Entry {
         self.to - self.from
     }
 
+    pub fn is_filtered(&self, input: &EntryCore, string: &Option<String>, comment: &Option<String>) -> bool {
+        if let Some(string) = string {
+            if !self.activity.contains(string)
+             && !self.project.contains(string)
+             && !self.comment.contains(string)
+             && !self.tags.iter().any(|tag| tag.contains(string)) {
+                return true;
+            }
+        }
+    
+        if !input.activity.is_empty() && self.activity != input.activity {
+            return true;
+        }
+    
+        if !input.project.is_empty() && self.project != input.project {
+            return true;
+        }
+    
+        if let Some(comment) = comment {
+            if !self.comment.contains(comment) {
+                return true;
+            }
+        }
+    
+        for tag in &input.tags {
+            if !self.tags.contains(tag) {
+                return true;
+            }
+        }
+    
+        false
+    }
+
     /// Gets a colorized string representation of this entry
     /// that can be used as part of a table.
     pub fn tabular(&self) -> String {
