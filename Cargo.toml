@@ -24,6 +24,7 @@ chrono = { version = "0.4", features = ["serde"] }
 dirs = "3.0.1"
 colored = "2.0.0"
 pager = "0.16.0"
+num-traits = "0.2"
 
 [dev-dependencies]
 proptest = "0.10.1"
