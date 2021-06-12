@@ -16,9 +16,9 @@ pub struct Summary {
     /// in its activity, project, tags, or comment.
     #[clap(short, long)]
     string: Option<String>,
-    /// Only summarize entries containing this substring in its comment.
-    #[clap(short = 'c', long)]
-    comment: Option<String>,
+    /// Only summarize entries containing this substring in its message comment.
+    #[clap(short = 'm', long)]
+    message: Option<String>,
     /// Only summarizes entries after this date-time.
     #[clap(short = 'f', long, parse(try_from_str = parse_datetime))]
     from: Option<DateTime<Utc>>,
@@ -193,7 +193,7 @@ mod test {
             year: false,
             day: false,
             string: None,
-            comment: None,
+            message: None,
             limit: 0,
             no_pager: false,
             hours: false,
@@ -264,7 +264,7 @@ mod test {
         };
 
         let mut summary = new_summary();
-        summary.comment = Some(String::from("curae"));
+        summary.message = Some(String::from("curae"));
 
         assert_eq!(expected, summary.collect_statistics(&test::read_test_entries()));
     }

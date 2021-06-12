@@ -15,9 +15,9 @@ pub struct Count {
     /// in its activity, project, tags, or comment.
     #[clap(short, long)]
     string: Option<String>,
-    /// Only count entries containing this substring in its comment.
-    #[clap(short = 'c', long)]
-    comment: Option<String>,
+    /// Only count entries containing this substring in its message comment.
+    #[clap(short = 'm', long)]
+    message: Option<String>,
     /// Only count entries after this date-time.
     #[clap(short = 'f', long, parse(try_from_str = parse_datetime))]
     from: Option<DateTime<Utc>>,
@@ -123,7 +123,7 @@ impl Count {
                 break;
             }
 
-            if !entry.complete() || !entry.valid() || to < entry.from || entry.is_filtered(&entry_core, &self.string, &self.comment) {
+            if !entry.complete() || !entry.valid() || to < entry.from || entry.is_filtered(&entry_core, &self.string, &self.message) {
                 continue;
             }
 
