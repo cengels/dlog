@@ -65,6 +65,22 @@ impl Subcommand for Fill {
     }
 }
 
+fn get_canonical_to(from: &DateTime<Utc>, to: &Option<DateTime<Utc>>) -> DateTime<Utc> {
+    if let Some(to) = to {
+        if from.date() < to.date() {
+            // Interprets the given `to` as belonging to the previous
+            // day if it the time is past midnight
+            let previous_day_time = *to - Duration::days(1);
+
+            if *from < previous_day_time {
+                return previous_day_time;
+            }
+        }
+
+        *to
+    } else { Utc::now().with_nanosecond(0).unwrap() }
+}
+
 impl Fill {
     fn parse_entry(&self, last: &Entry) -> Result<Entry, Box<dyn Error>> {
         if self.duration.is_some() && self.from.is_some() && self.to.is_some() {
@@ -92,8 +108,6 @@ impl Fill {
             entry.comment = message.to_owned();
         }
 
-        entry.to = self.to.or_else(|| Utc::now().with_nanosecond(0)).unwrap();
-
         if let Some(from) = self.from {
             entry.from = from;
         } else if !self.update && last.complete() {
@@ -103,6 +117,8 @@ impl Fill {
                 last.to
             }
         }
+
+        entry.to = get_canonical_to(&entry.from, &self.to);
 
         if let Some(duration) = self.duration {
             if self.to.is_some() {
