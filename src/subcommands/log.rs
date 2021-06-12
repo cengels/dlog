@@ -5,11 +5,18 @@ use colored::Colorize;
 use entries::Entry;
 use pager::Pager;
 use super::Subcommand;
-use crate::{entries, format, input::parse_datetime};
+use crate::{entries::{self, EntryCore}, format, input::parse_datetime};
 
 /// Prints a log of the last n (or all if -l is not specified) entries.
 #[derive(Clap, Debug)]
 pub struct Log {
+    /// Only log entries where this string can be found
+    /// in its activity, project, tags, or comment.
+    #[clap(short, long)]
+    string: Option<String>,
+    /// Only log entries containing this substring in its comment message.
+    #[clap(short = 'm', long)]
+    message: Option<String>,
     /// Only prints entries after this date-time.
     #[clap(short = 'f', long, parse(try_from_str = parse_datetime))]
     from: Option<DateTime<Utc>>,
@@ -25,7 +32,13 @@ pub struct Log {
     comments: bool,
     /// Prints the entries without a pager. Note that this may flood your terminal.
     #[clap(short = 'P', long)]
-    no_pager: bool
+    no_pager: bool,
+    /// An activity and optionally project and tags in the format of
+    /// `<activity>[:<project>] [+<tag>...]` to filter the entries.
+    ///
+    /// Activity and project are always fully matched while the tags
+    /// allow partial matches.
+    activity_project_tags: Vec<String>
 }
 
 impl Subcommand for Log {
@@ -41,6 +54,7 @@ impl Subcommand for Log {
             Pager::new().setup();
         }
 
+        let entry_core = self.activity_project_tags.join(" ").parse::<EntryCore>().unwrap();
         let mut day = Utc::now().date();
         let mut day_entries = Vec::<&Entry>::new();
         let mut counter = 0;
@@ -50,7 +64,7 @@ impl Subcommand for Log {
                 break;
             }
 
-            if !entry.complete() || !entry.valid() || self.to.filter(|to| *to < entry.from).is_some() {
+            if !entry.complete() || !entry.valid() || self.to.filter(|to| *to < entry.from).is_some() || entry.is_filtered(&entry_core, &self.string, &self.message) {
                 continue;
             }
 
