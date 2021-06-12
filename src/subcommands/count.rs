@@ -70,6 +70,8 @@ impl Subcommand for Count {
     }
 }
 
+type CountStatistics = Statistics<u32>;
+
 fn add_one(map: &mut HashMap<String, u32>, key: String) {
     if key.is_empty() {
         return;
@@ -111,7 +113,7 @@ impl Count {
         self.to.unwrap_or_else(|| Utc::now().with_nanosecond(0).unwrap())
     }
 
-    fn collect_statistics(&self, entries: &[Entry]) -> Statistics<u32> {
+    fn collect_statistics(&self, entries: &[Entry]) -> CountStatistics {
         let entry_core = self.activity_project_tags.join(" ").parse::<EntryCore>().unwrap();
         let to = self.to();
         let from = self.from();
@@ -149,7 +151,7 @@ impl Count {
         stats
     }
 
-    fn print_results(&self, statistics: &Statistics<u32>) {
+    fn print_results(&self, statistics: &CountStatistics) {
         if !self.no_pager {
             Pager::new().setup();
         }

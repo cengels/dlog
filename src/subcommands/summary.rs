@@ -74,6 +74,8 @@ impl Subcommand for Summary {
     }
 }
 
+type SummaryStatistics = Statistics<Duration>;
+
 fn add_duration(map: &mut HashMap<String, Duration>, key: String, duration: &Duration) {
     if key.is_empty() {
         return;
@@ -116,7 +118,7 @@ impl Summary {
         self.to.unwrap_or_else(|| Utc::now().with_nanosecond(0).unwrap())
     }
 
-    fn collect_statistics(&self, entries: &[Entry]) -> Statistics<Duration> {
+    fn collect_statistics(&self, entries: &[Entry]) -> SummaryStatistics {
         let entry_core = self.activity_project_tags.join(" ").parse::<EntryCore>().unwrap();
         let to = self.to();
         let from = self.from();
@@ -129,7 +131,7 @@ impl Summary {
                 break;
             }
 
-            if !entry.complete() || !entry.valid() || to < entry.from || entry.is_filtered(&entry_core, &self.string, &self.comment) {
+            if !entry.complete() || !entry.valid() || to < entry.from || entry.is_filtered(&entry_core, &self.string, &self.message) {
                 continue;
             }
 
@@ -161,7 +163,7 @@ impl Summary {
         stats
     }
 
-    fn print_results(&self, statistics: &Statistics<Duration>) {
+    fn print_results(&self, statistics: &SummaryStatistics) {
         if !self.no_pager {
             Pager::new().setup();
         }
@@ -181,7 +183,7 @@ mod test {
     use std::collections::HashMap;
     use chrono::{Duration, TimeZone, Utc};
     use crate::{data::Statistics, test};
-    use super::Summary;
+    use super::{Summary, SummaryStatistics};
 
     fn new_summary() -> Summary {
         Summary {
@@ -201,7 +203,7 @@ mod test {
         }
     }
 
-    fn stats_for(timestamp: i64, days: i64) -> Statistics<Duration> {
+    fn stats_for(timestamp: i64, days: i64) -> SummaryStatistics {
         let mut summary = new_summary();
         summary.to = Some(Utc.timestamp(timestamp, 0));
         summary.from = Some(summary.to.unwrap() - Duration::days(days));
