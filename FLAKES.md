@@ -19,3 +19,11 @@ run the executable:
 ```
 ./result/bin/dlog
 ```
+
+## keeping `Cargo.nix` up to date
+
+this should be run if `Cargo.toml` / `Cargo.lock` are changed. `Cargo.nix` is used for `nix build`.
+
+```
+cargo2nix -f
+```
