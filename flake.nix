@@ -1,5 +1,5 @@
 {
-  description = "speedread-rs";
+  description = "dlog";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
