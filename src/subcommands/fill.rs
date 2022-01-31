@@ -41,7 +41,12 @@ impl Subcommand for Fill {
         let mut entries = entries::read_all().unwrap_or_else(|_| Vec::<Entry>::new());
         let last: Entry = entries.last().ok_or(errors::NoEntryError)?.clone();
         let new_entry = self.parse_entry(&last)?;
-        let should_update = !self.new && (!last.complete() || self.update || new_entry.content_equals(&last));
+        let should_update = {
+            if self.new { false }
+            else if self.update || !last.complete() { true }
+            else if new_entry.from != last.from { false }
+            else { new_entry.content_equals(&last) }
+        };
 
         if should_update {
             entries.remove(entries.len() - 1);
