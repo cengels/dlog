@@ -2,3 +2,6 @@
 /.vscode
 /.idea
 entries
+
+.direnv/
+result
